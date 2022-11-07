@@ -6,6 +6,7 @@ import database as _database
 import models as _models
 import schemas as _schemas
 import sqlalchemy.orm as _orm
+import sqlalchemy as _sql
 import json as _json
 import fastapi as _fastapi
 import datetime as _dt
@@ -66,3 +67,18 @@ async def delete_doc(doc_id : int , db : _orm.Session):
 
     db.delete(doc_db)
     db.commit()
+
+# Get doctors by name
+async def get_docs_by_name(doc_name : str, db : _orm.Session):
+    items = db.query(_models.Doctor).filter(_models.Doctor.name.contains(doc_name))
+    return list(map(_schemas.Doctor.from_orm, items))
+
+# Get doctors by spec
+async def get_docs_by_spec(spec_name : str, db : _orm.Session):
+    items = db.query(_models.Doctor).filter(_models.Doctor.spec.contains(spec_name))
+    return list(map(_schemas.Doctor.from_orm, items))
+
+# Get all docs
+async def get_docs(db : _orm.Session):
+    items = db.query(_models.Doctor).filter(_models.Doctor.spec.contains(''))
+    return list(map(_schemas.Doctor.from_orm, items))

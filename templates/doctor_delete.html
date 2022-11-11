@@ -1,12 +1,13 @@
 <div class="login-box">
   <h2>Doctor</h2>
-  <form>
+  <form method="post">
     <div class="user-box">
-      <input type="text" name="" required="">
-      <label>ID</label>
+      <label>ID:</label>
+      <input type="num" name="doctor_id" required="">
     </div>
-    <a href="#"><button>
+    <a href="#"><button type="submit">
       Delete
     </button></a>
   </form>
+  <p class="">{{ statusMessage }}</p>
 </div>

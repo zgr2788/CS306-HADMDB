@@ -41,8 +41,8 @@ async def create_doctor(request : _fastapi.Request, name : str =  _fastapi.Form(
 # Delete a doctor
 @app.get("/delete/doctors/")
 async def delete_doctor(request: _fastapi.Request):
-    statusMessage = "Start typing id..."
-    return templates.TemplateResponse('doctor_delete.html', context = {'request': request, 'result': statusMessage})
+    statusMessage = "Type the id of the doctor you would like to delete..."
+    return templates.TemplateResponse('doctor_delete.html', context = {'request': request, 'statusMessage': statusMessage})
 
 
 @app.post("/delete/doctors/", status_code = 204)
@@ -53,10 +53,11 @@ async def delete_doctor(request : _fastapi.Request, doctor_id : int = _fastapi.F
         statusMessage = "Doctor with id " + str(doctor_id) + " does not exist in database!"
     
     else:
+        name = doc_db.name
         await _services.delete_doc(doc_id = doctor_id , db = db)
-        statusMessage = "Successfully deleted doctor with id " + str(doctor_id)
+        statusMessage = "Successfully deleted " + str(name) + " from the database."
 
-    return templates.TemplateResponse('doctor_delete.html', context = {'request': request, 'result' : statusMessage})
+    return templates.TemplateResponse('doctor_delete.html', context = {'request': request, 'statusMessage' : statusMessage})
 
 
 # Get doctors by name

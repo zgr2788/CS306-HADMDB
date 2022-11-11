@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Shadow database
-backend/database.db
+database.db

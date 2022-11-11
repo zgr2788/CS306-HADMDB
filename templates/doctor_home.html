@@ -1,27 +1,22 @@
+<head>
+  <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
+
 <div class="login-box"; style="text-align:center;">
   <h2>Doctor</h2>
-  <form>
+  <form action="/create/doctors">
     <a href="#"><button>
       Insert
     </button></a>
-        <a href="#"><button>
-      Delete
-    </button></a>
-        <a href="#"><button>
-      Selection
-    </button></a>
   </form>
-</div><div class="login-box"; style="text-align:center;">
-  <h2>Doctor</h2>
-  <form>
+  <form action="/delete/doctors">
     <a href="#"><button>
-      Insert
-    </button></a>
-        <a href="#"><button>
       Delete
     </button></a>
-        <a href="#"><button>
-      Selection
+  </form>
+  <form action="/get/doctors">
+    <a href="#"><button>
+      Select
     </button></a>
   </form>
-</div>

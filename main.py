@@ -4,6 +4,7 @@
 
 import fastapi as _fastapi
 import fastapi.templating as _templates
+import fastapi.staticfiles as _StaticFiles
 import sqlalchemy.orm as _orm
 import services as _services, schemas as _schemas, models as _models, database as _database
 from typing import List
@@ -13,7 +14,15 @@ app = _fastapi.FastAPI()
 
 _services.create_database()
 
+app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static")
+
 templates = _templates.Jinja2Templates(directory = "templates")
+
+
+# Main page
+@app.get("/")
+async def main_page(request: _fastapi.Request):
+    return templates.TemplateResponse('doctor_home.html', context = {'request' : request})
 
 
 #*********************************************************
@@ -25,7 +34,7 @@ templates = _templates.Jinja2Templates(directory = "templates")
 # Create a doctor
 @app.get("/create/doctors/")
 async def create_doctor(request: _fastapi.Request):
-    statusMessage = "Start typing names..."
+    statusMessage = ""
     return templates.TemplateResponse('doctor_insert.html', context = {'request': request, 'statusMessage': statusMessage})
 
 @app.post("/create/doctors/")
@@ -41,7 +50,7 @@ async def create_doctor(request : _fastapi.Request, name : str =  _fastapi.Form(
 # Delete a doctor
 @app.get("/delete/doctors/")
 async def delete_doctor(request: _fastapi.Request):
-    statusMessage = "Type the id of the doctor you would like to delete..."
+    statusMessage = ""
     return templates.TemplateResponse('doctor_delete.html', context = {'request': request, 'statusMessage': statusMessage})
 
 
@@ -63,20 +72,26 @@ async def delete_doctor(request : _fastapi.Request, doctor_id : int = _fastapi.F
 # Get doctors by name
 @app.get("/get/doctors/")
 async def get_doctors_by_name(request: _fastapi.Request):
-    statusMessage = "Start typing name..."
-    return templates.TemplateResponse('doctor_select.html', context = {'request': request, 'result': statusMessage})
+    statusMessage = ""
+    return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'statusMessage': statusMessage})
 
 @app.post("/get/doctors/", status_code = 200)
 async def get_doctors_by_name(request: _fastapi.Request, doctor_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
-    doc_list = [(doctor.name, doctor.spec, doctor.id) for doctor in await _services.get_docs_by_name(doc_name = doctor_name, db = db)]
+    
+    # Wildcard search
+    if doctor_name == "*":
+        statusMessage = [doctor.name for doctor in await _services.get_docs(db = db)]  
+        return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+
+    doc_list = [doctor.name for doctor in await _services.get_docs_by_name(doc_name = doctor_name, db = db)]
     
     if doc_list:
-        statusMessage = doc_list
+        statusMessage = "Search Results:\n\n\n" + str(doc_list)
     
     else:
         statusMessage = "No doctors found!"
 
-    return templates.TemplateResponse('doctor_select.html', context = {'request': request, 'result': statusMessage})
+    return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'statusMessage': statusMessage})
 
 # Get all doctors - debug
 @app.get("/api/get/doctors", status_code = 200)

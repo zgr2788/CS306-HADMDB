@@ -1,9 +1,25 @@
+<head>
+  <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
 <div class="login-box"; style="text-align:center;">
   <h2>Doctor</h2>
   <div class="container">
-    <form>
-    <input type="search" placeholder="Search by name...">
-    <button type="submit">Search</button>
-  </form>
+    <form method="post">
+      <input type="search" name="doctor_name" placeholder="Search by name..." required="">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <p class="">{{ statusMessage }}</p>
+  </div>
+
+  <div class="container">
+    <form action="/">
+      <a href="#"><button>
+        Back to Homepage
+      </button></a>
+    </form>
   </div>
 </div>

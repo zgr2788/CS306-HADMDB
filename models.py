@@ -31,3 +31,85 @@ class Doctor(_database.Base):
     spec = _sql.Column(_sql.String, index = True)      # Specialization
     name = _sql.Column(_sql.String, index = True)      # Name
 
+
+#*********************************************************
+
+# NURSES 
+
+#*********************************************************
+
+class Nurse(_database.Base):
+
+    # Name
+    __tablename__ = "nurses"
+
+    #Columns
+    id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique nurse id - pkey
+    name = _sql.Column(_sql.String, index = True)      # Name
+
+
+#*********************************************************
+
+# SERVICES 
+
+#*********************************************************
+
+class Service(_database.Base):
+
+    # Name
+    __tablename__ = "services"
+
+    #Columns
+    id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique services id - pkey
+    type = _sql.Column(_sql.String, index = True)      # Type
+    name = _sql.Column(_sql.String, index = True)      # Name
+
+#*********************************************************
+
+# ROOMS 
+
+#*********************************************************
+
+class Room(_database.Base):
+
+    # Name
+    __tablename__ = "rooms"
+
+    #Columns
+    id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique rooms id - pkey
+    size = _sql.Column(_sql.Integer, index = True)      # Size
+
+
+#*********************************************************
+
+# PATIENT 
+
+#*********************************************************
+
+class Patient(_database.Base):
+
+    # Name
+    __tablename__ = "patients"
+
+    #Columns
+    id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique patient id - pkey
+    history = _sql.Column(_sql.String, index = True)      # History
+    name = _sql.Column(_sql.String, index = True)      # Name
+
+#*********************************************************
+
+# TREATMENTS 
+
+#*********************************************************
+
+class Treatment(_database.Base):
+
+    # Name
+    __tablename__ = "treatments"
+
+    #Columns
+    billed_to = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id'), ondelete="CASCADE",  index = True)  # Unique doctor id - fkey
+    cost = _sql.Column(_sql.Integer, index = True)      # Specialization
+    name = _sql.Column(_sql.String, index = True)      # Name
+
+#*********************************************************

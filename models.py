@@ -77,7 +77,7 @@ class Room(_database.Base):
 
     #Columns
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique rooms id - pkey
-    size = _sql.Column(_sql.Integer, index = True)      # Size
+    size = _sql.Column(_sql.Integer, index = True)      # Room size
 
 
 #*********************************************************
@@ -108,8 +108,8 @@ class Treatment(_database.Base):
     __tablename__ = "treatments"
 
     #Columns
-    billed_to = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id'), ondelete="CASCADE",  index = True)  # Unique doctor id - fkey
-    cost = _sql.Column(_sql.Integer, index = True)      # Specialization
+    billed_to = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id', ondelete="CASCADE"), primary_key=True,  index = True)  # Unique patient.id for billed_to - fkey
+    cost = _sql.Column(_sql.Integer, index = True)      # Cost
     name = _sql.Column(_sql.String, index = True)      # Name
 
 #*********************************************************

@@ -34,36 +34,23 @@
     
     </style>
   
-  <div class="login-box"; style="text-align:center;">
-    <h2>All Doctors</h2>
+  <div class="login-box">
+    <h2>Insert Nurses</h2>
+    <form method = "post">
+      <div class="user-box">
+        <input type="text" name="name" required="">
+        <label>Name</label>
+      </div>
+      <a href="#"><button type="submit">
+        Insert
+      </button></a>
+    </form>
+  
+    <p>{{ statusMessage }}</p>
+  
     
-  
-    {% if docs_list -%}
-    <table width="300 px">
-      <tr>
-          <th width="100px">Name</th>
-          <th width="100px">Specialization</th>
-          <th width="100px">Id</th>
-      </tr>
-      {% for doc in docs_list %}
-      <tr style="line-height: 24px">
-          <td>{{ doc.name }}</td>
-          <td>{{ doc.spec }}</td>
-          <td>{{ doc.id }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-   
-  
-    {% else -%}
     <div class="container">
-      <p> No doctors registered yet! </p>
-    </div>
-  
-    {% endif %}
-  
-    <div class="container">
-      <form action="/home/doctors">
+      <form action="/home/nurses">
         <a href="#"><button class="mybutton2">
           Back to Homepage
         </button></a>

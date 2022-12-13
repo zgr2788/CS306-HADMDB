@@ -35,20 +35,18 @@
     </style>
   
   <div class="login-box"; style="text-align:center;">
-    <h2>All Doctors</h2>
+    <h2>All Nurses</h2>
     
   
     {% if docs_list -%}
     <table width="300 px">
       <tr>
-          <th width="100px">Name</th>
-          <th width="100px">Specialization</th>
-          <th width="100px">Id</th>
+          <th width="150px">Name</th>
+          <th width="150px">Id</th>
       </tr>
       {% for doc in docs_list %}
       <tr style="line-height: 24px">
           <td>{{ doc.name }}</td>
-          <td>{{ doc.spec }}</td>
           <td>{{ doc.id }}</td>
       </tr>
       {% endfor %}
@@ -57,13 +55,13 @@
   
     {% else -%}
     <div class="container">
-      <p> No doctors registered yet! </p>
+      <p> No nurses registered yet! </p>
     </div>
   
     {% endif %}
   
     <div class="container">
-      <form action="/home/doctors">
+      <form action="/home/nurses">
         <a href="#"><button class="mybutton2">
           Back to Homepage
         </button></a>

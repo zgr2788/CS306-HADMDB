@@ -106,6 +106,25 @@ p{
   color : white;
 }
 
+td{
+  text-align : center;
+  color : white;
+  border: 1px solid white;
+  border-collapse: collapse;
+}
+
+th{
+  text-align : center;
+  color : white;
+  border: 1px solid white;
+  border-collapse: collapse;
+}
+
+table{
+  border: 1px solid white;
+  border-collapse: collapse;
+}
+
 input[type="search"]::placeholder {
   color: white;
 }

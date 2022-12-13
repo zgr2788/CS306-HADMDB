@@ -7,6 +7,7 @@ import fastapi.templating as _templates
 import fastapi.staticfiles as _StaticFiles
 import sqlalchemy.orm as _orm
 import services as _services, schemas as _schemas, models as _models, database as _database
+import jinja2 as _jinja2
 from typing import List
 
 
@@ -77,21 +78,18 @@ async def get_doctors_by_name(request: _fastapi.Request):
 
 @app.post("/get/doctors/", status_code = 200)
 async def get_doctors_by_name(request: _fastapi.Request, doctor_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
-
+    statusMessage = ""
     # Wildcard search
     if doctor_name == "*":
-        statusMessage = [doctor.name for doctor in await _services.get_docs(db = db)]
-        return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+        doc_list = await _services.get_docs(db=db)
+        return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'docs_list': doc_list, 'statusMessage' : statusMessage})
 
-    doc_list = [doctor.name for doctor in await _services.get_docs_by_name(doc_name = doctor_name, db = db)]
+    doc_list = await _services.get_docs_by_name(doc_name = doctor_name, db = db)
 
-    if doc_list:
-        statusMessage = "Search Results:\n\n\n" + str(doc_list)
-
-    else:
+    if not doc_list:
         statusMessage = "No doctors found!"
 
-    return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+    return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'docs_list': doc_list, 'statusMessage' : statusMessage})
 
 # Get all doctors - debug
 @app.get("/api/get/doctors", status_code = 200)

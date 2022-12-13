@@ -43,9 +43,29 @@
     </form>
   </div>
 
+  {% if docs_list -%}
+  <table width="300 px">
+    <tr>
+        <th width="100px">Name</th>
+        <th width="100px">Specialization</th>
+        <th width="100px">Id</th>
+    </tr>
+    {% for doc in docs_list %}
+    <tr>
+        <td>{{ doc.name }}</td>
+        <td>{{ doc.spec }}</td>
+        <td>{{ doc.id }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+ 
+
+  {% else -%}
   <div class="container">
-    <p class="">{{ statusMessage }}</p>
+    <p> {{statusMessage}} </p>
   </div>
+
+  {% endif %}
 
   <div class="container">
     <form action="/">

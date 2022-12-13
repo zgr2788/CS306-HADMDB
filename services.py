@@ -83,6 +83,7 @@ async def get_docs(db : _orm.Session):
     items = db.query(_models.Doctor).filter(_models.Doctor.spec.contains(''))
     return list(map(_schemas.Doctor.from_orm, items))
 
+
 #*********************************************************
 
 # NURSES
@@ -126,3 +127,52 @@ async def get_nurs_by_name(nur_name : str, db : _orm.Session):
 async def get_nurses(db : _orm.Session):
     items = db.query(_models.Nurse).filter(_models.Nurse.name.contains(''))
     return list(map(_schemas.Nurse.from_orm, items))
+
+
+#*********************************************************
+
+# SERVICES 
+
+#*********************************************************
+
+# Service query by id
+async def get_ser_by_id(id : int, db : _orm.Session):
+    return db.query(_models.Service).filter(_models.Service.id == id).first()
+
+# Create new ser
+async def create_ser(ser : _schemas._ServiceCreate, db : _orm.Session):
+        
+    # New doctor object
+    serObj = _models.Service(
+        name = ser.name,
+        type = ser.type  
+    )
+
+    # Write to db
+    db.add(serObj)
+    db.commit()
+    db.refresh(serObj)
+    return serObj
+
+# Delete ser
+async def delete_ser(ser_id : int , db : _orm.Session):
+    ser_db =  await get_ser_by_id(ser_id, db)
+
+    if ser_db is None:
+        raise _fastapi.HTTPException(status_code=404, detail = "Personnel ID not found in database!")
+
+    db.delete(ser_db)
+    db.commit()
+
+# Get sers by name
+async def get_sers_by_name(ser_name : str, db : _orm.Session):
+    items = db.query(_models.Service).filter(_models.Service.name.contains(ser_name))
+    return list(map(_schemas.Service.from_orm, items))
+
+# Get all sers
+async def get_sers(db : _orm.Session):
+    items = db.query(_models.Service).filter(_models.Service.type.contains(''))
+    return list(map(_schemas.Service.from_orm, items))
+
+
+

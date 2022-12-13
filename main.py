@@ -177,3 +177,78 @@ async def get_nurses_by_name(request: _fastapi.Request, nurse_name : str = _fast
 async def get_all_nurses(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
     nurs_list = await _services.get_nurses(db = db)
     return templates.TemplateResponse('nurse_display.html', context = {'request' : request, 'docs_list' : nurs_list})
+
+
+#*********************************************************
+
+# SERVICES
+
+#*********************************************************
+# Get service home
+@app.get("/home/services/")
+async def home_service(request: _fastapi.Request):
+    return templates.TemplateResponse('service_home.html', context = {'request' : request})
+
+# Create a nurse
+@app.get("/create/services/")
+async def create_service(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('service_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/create/services/")
+async def create_service(request : _fastapi.Request, name : str =  _fastapi.Form(), type : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    ser = _schemas._ServiceCreate(
+        name = name,
+        type = type
+    )
+    new_ser = await _services.create_ser(ser, db)
+    statusMessage = "Successfully added personnel " + str(new_ser.name) + " with ID: " + str(new_ser.id) + "."
+    return templates.TemplateResponse('service_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+# Delete a doctor
+@app.get("/delete/services/")
+async def delete_service(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('service_delete.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/delete/services/", status_code = 204)
+async def delete_service(request : _fastapi.Request, service_id : int = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    ser_db = await _services.get_ser_by_id(service_id, db)
+
+    if not ser_db:
+        statusMessage = "Personnel with id " + str(service_id) + " does not exist in database!"
+
+    else:
+        name = ser_db.name
+        await _services.delete_ser(ser_id = service_id , db = db)
+        statusMessage = "Successfully deleted " + str(name) + " with ID: " + str(service_id) + " from the database."
+
+    return templates.TemplateResponse('service_delete.html', context = {'request': request, 'statusMessage' : statusMessage})
+
+# Get doctors by name
+@app.get("/get/services/")
+async def get_services_by_name(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('service_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/get/services/", status_code = 200)
+async def get_services_by_name(request: _fastapi.Request, service_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    statusMessage = ""
+
+    # Wildcard search
+    if service_name == "*":
+        service_list = await _services.get_sers(db=db)
+        return templates.TemplateResponse('service_selection.html', context = {'request': request, 'docs_list': service_list, 'statusMessage' : statusMessage})
+
+    service_list = await _services.get_sers_by_name(ser_name = service_name, db = db)
+
+    if not service_list:
+        statusMessage = "No personnel found!"
+
+    return templates.TemplateResponse('service_selection.html', context = {'request': request, 'docs_list': service_list, 'statusMessage' : statusMessage})
+
+# Get all doctors - debug
+@app.get("/getall/services", status_code = 200)
+async def get_all_services(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    sers_list = await _services.get_sers(db = db)
+    return templates.TemplateResponse('service_display.html', context = {'request' : request, 'docs_list' : sers_list})

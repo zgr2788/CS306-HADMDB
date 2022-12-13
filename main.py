@@ -79,6 +79,7 @@ async def get_doctors_by_name(request: _fastapi.Request):
 @app.post("/get/doctors/", status_code = 200)
 async def get_doctors_by_name(request: _fastapi.Request, doctor_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
     statusMessage = ""
+
     # Wildcard search
     if doctor_name == "*":
         doc_list = await _services.get_docs(db=db)
@@ -92,13 +93,7 @@ async def get_doctors_by_name(request: _fastapi.Request, doctor_name : str = _fa
     return templates.TemplateResponse('doctor_selection.html', context = {'request': request, 'docs_list': doc_list, 'statusMessage' : statusMessage})
 
 # Get all doctors - debug
-@app.get("/api/get/doctors", status_code = 200)
-async def get_all_doctors(db: _orm.Session = _fastapi.Depends(_services.get_db)):
-    return await _services.get_docs(db = db)
-
-
-
-## Display doctors by specialization
-#@app.get("/api/doctors/spec/{spec_name}", status_code = 200)
-#async def get_doctors_by_spec(specialization: str, db: _orm.Session = _fastapi.Depends(_services.get_db)):
-#    return await _services.get_docs_by_spec(spec_name = specialization, db = db)
+@app.get("/getall/doctors", status_code = 200)
+async def get_all_doctors(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    docs_list = await _services.get_docs(db = db)
+    return templates.TemplateResponse('doctor_display.html', context = {'request' : request, 'docs_list' : docs_list})

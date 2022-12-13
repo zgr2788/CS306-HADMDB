@@ -35,7 +35,7 @@
   </style>
 
 <div class="login-box"; style="text-align:center;">
-  <h2>Doctor</h2>
+  <h2>Search Doctors</h2>
   <div class="container">
     <form method="post">
       <input type="search" name="doctor_name" placeholder="Search by name..." required="">
@@ -51,7 +51,7 @@
         <th width="100px">Id</th>
     </tr>
     {% for doc in docs_list %}
-    <tr>
+    <tr style="line-height: 24px">
         <td>{{ doc.name }}</td>
         <td>{{ doc.spec }}</td>
         <td>{{ doc.id }}</td>

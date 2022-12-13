@@ -30,3 +30,101 @@ class Doctor(_DoctorCreate):
 
     class Config:
         orm_mode = True
+
+
+#*********************************************************
+
+# NURSES
+
+#*********************************************************
+class _NurseCreate(_pydantic.BaseModel):
+    name : str
+
+    class Config:
+        orm_mode = True 
+
+
+class Nurse(_NurseCreate):
+    id : int
+
+
+    class Config:
+        orm_mode = True
+
+
+#*********************************************************
+
+# SERVICES
+
+#*********************************************************
+class _ServiceCreate(_pydantic.BaseModel):
+    name : str
+    type : str
+
+    class Config:
+        orm_mode = True 
+
+
+class Service(_ServiceCreate):
+    id : int
+
+
+    class Config:
+        orm_mode = True
+
+
+#*********************************************************
+
+# ROOM
+
+#*********************************************************
+class _RoomCreate(_pydantic.BaseModel):
+    size : int
+
+    class Config:
+        orm_mode = True 
+
+
+class Room(_RoomCreate):
+    id : int
+
+
+    class Config:
+        orm_mode = True
+
+
+#*********************************************************
+
+# PATIENT 
+
+#*********************************************************
+
+class _PatientCreate(_pydantic.BaseModel):
+    name : str
+    history : str
+
+    class Config:
+        orm_mode = True 
+
+
+class Patient(_PatientCreate):
+    id : int
+
+
+    class Config:
+        orm_mode = True
+
+
+#*********************************************************
+
+# TREATMENT 
+
+#*********************************************************
+
+class Treatment(_pydantic.BaseModel):
+    billed_to : int
+    cost : int
+    name : str
+
+    class Config:
+        orm_mode = True 

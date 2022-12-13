@@ -23,7 +23,7 @@ templates = _templates.Jinja2Templates(directory = "templates")
 # Main page
 @app.get("/")
 async def main_page(request: _fastapi.Request):
-    return templates.TemplateResponse('doctor_home.html', context = {'request' : request})
+    return templates.TemplateResponse('homepage.html', context = {'request' : request})
 
 
 #*********************************************************
@@ -31,6 +31,10 @@ async def main_page(request: _fastapi.Request):
 # DOCTORS
 
 #*********************************************************
+# Get doctor home
+@app.get("/home/doctors/")
+async def home_doctor(request: _fastapi.Request):
+    return templates.TemplateResponse('doctor_home.html', context = {'request' : request})
 
 # Create a doctor
 @app.get("/create/doctors/")

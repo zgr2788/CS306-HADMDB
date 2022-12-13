@@ -25,6 +25,10 @@ templates = _templates.Jinja2Templates(directory = "templates")
 async def main_page(request: _fastapi.Request):
     return templates.TemplateResponse('homepage.html', context = {'request' : request})
 
+# Admin Panel
+@app.get("/adminpanel")
+async def admin_panel(request: _fastapi.Request):
+    return templates.TemplateResponse('admin_panel.html', context = {'request' : request})
 
 #*********************************************************
 

@@ -92,6 +92,7 @@ class Patient(_database.Base):
     __tablename__ = "patients"
 
     #Columns
+    treated_by = _sql.Column(_sql.Integer, _sql.ForeignKey('doctors.id', ondelete="CASCADE"),  index = True)  # Unique patient.id for billed_to - fkey
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique patient id - pkey
     history = _sql.Column(_sql.String, index = True)      # History
     name = _sql.Column(_sql.String, index = True)      # Name

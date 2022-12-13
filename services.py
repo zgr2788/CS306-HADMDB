@@ -175,4 +175,48 @@ async def get_sers(db : _orm.Session):
     return list(map(_schemas.Service.from_orm, items))
 
 
+#*********************************************************
+
+# ROOMS
+
+#*********************************************************
+
+# ro query by id
+async def get_ro_by_id(id : int, db : _orm.Session):
+    return db.query(_models.Room).filter(_models.Room.id == id).first()
+
+# Create new ro
+async def create_ro(ro : _schemas._RoomCreate, db : _orm.Session):
+        
+    # New doctor object
+    roObj = _models.Room(
+        name = ro.name,
+        size = ro.size  
+    )
+
+    # Write to db
+    db.add(roObj)
+    db.commit()
+    db.refresh(roObj)
+    return roObj
+
+# Delete ro
+async def delete_ro(ro_id : int , db : _orm.Session):
+    ro_db =  await get_ro_by_id(ro_id, db)
+
+    if ro_db is None:
+        raise _fastapi.HTTPException(status_code=404, detail = "Room ID not found in database!")
+
+    db.delete(ro_db)
+    db.commit()
+
+# Get ros by name
+async def get_ros_by_name(ro_name : str, db : _orm.Session):
+    items = db.query(_models.Room).filter(_models.Room.name.contains(ro_name))
+    return list(map(_schemas.Room.from_orm, items))
+
+# Get all ros
+async def get_ros(db : _orm.Session):
+    items = db.query(_models.Room).filter(_models.Room.name.contains(''))
+    return list(map(_schemas.Room.from_orm, items))
 

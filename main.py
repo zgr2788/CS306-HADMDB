@@ -189,7 +189,7 @@ async def get_all_nurses(request: _fastapi.Request, db: _orm.Session = _fastapi.
 async def home_service(request: _fastapi.Request):
     return templates.TemplateResponse('service_home.html', context = {'request' : request})
 
-# Create a nurse
+# Create aservice
 @app.get("/create/services/")
 async def create_service(request: _fastapi.Request):
     statusMessage = ""
@@ -205,7 +205,7 @@ async def create_service(request : _fastapi.Request, name : str =  _fastapi.Form
     statusMessage = "Successfully added personnel " + str(new_ser.name) + " with ID: " + str(new_ser.id) + "."
     return templates.TemplateResponse('service_insert.html', context = {'request': request, 'statusMessage': statusMessage})
 
-# Delete a doctor
+# Delete a service
 @app.get("/delete/services/")
 async def delete_service(request: _fastapi.Request):
     statusMessage = ""
@@ -225,7 +225,7 @@ async def delete_service(request : _fastapi.Request, service_id : int = _fastapi
 
     return templates.TemplateResponse('service_delete.html', context = {'request': request, 'statusMessage' : statusMessage})
 
-# Get doctors by name
+# Get services by name
 @app.get("/get/services/")
 async def get_services_by_name(request: _fastapi.Request):
     statusMessage = ""
@@ -247,8 +247,89 @@ async def get_services_by_name(request: _fastapi.Request, service_name : str = _
 
     return templates.TemplateResponse('service_selection.html', context = {'request': request, 'docs_list': service_list, 'statusMessage' : statusMessage})
 
-# Get all doctors - debug
+# Get all services - debug
 @app.get("/getall/services", status_code = 200)
 async def get_all_services(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
     sers_list = await _services.get_sers(db = db)
     return templates.TemplateResponse('service_display.html', context = {'request' : request, 'docs_list' : sers_list})
+
+
+#*********************************************************
+
+# ROOMS
+
+#*********************************************************
+# Get service home
+@app.get("/home/rooms/")
+async def home_room(request: _fastapi.Request):
+    return templates.TemplateResponse('room_home.html', context = {'request' : request})
+
+# Create aroom
+@app.get("/create/rooms/")
+async def create_room(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('room_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/create/rooms/")
+async def create_room(request : _fastapi.Request, size : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    try :
+        sizeNum = int(size)
+    except :
+        statusMessage = "Please enter numeric value for size!"
+        return templates.TemplateResponse('room_insert.html', context = {'request': request, 'statusMessage': statusMessage}) 
+    
+    ro = _schemas._RoomCreate(
+        size = sizeNum,
+        name = name
+    )
+    new_ro = await _services.create_ro(ro, db)
+    statusMessage = "Successfully added room " + str(new_ro.name) + " with ID: " + str(new_ro.id) + "."
+    return templates.TemplateResponse('room_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+# Delete a room
+@app.get("/delete/rooms/")
+async def delete_room(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('room_delete.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/delete/rooms/", status_code = 204)
+async def delete_room(request : _fastapi.Request, room_id : int = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    ro_db = await _services.get_ro_by_id(room_id, db)
+
+    if not ro_db:
+        statusMessage = "Room with id " + str(room_id) + " does not exist in database!"
+
+    else:
+        name = ro_db.name
+        await _services.delete_ro(ro_id = room_id , db = db)
+        statusMessage = "Successfully deleted " + str(name) + " with ID: " + str(room_id) + " from the database."
+
+    return templates.TemplateResponse('room_delete.html', context = {'request': request, 'statusMessage' : statusMessage})
+
+# Get rooms by name
+@app.get("/get/rooms/")
+async def get_rooms_by_name(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('room_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/get/rooms/", status_code = 200)
+async def get_rooms_by_name(request: _fastapi.Request, room_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    statusMessage = ""
+
+    # Wildcard search
+    if room_name == "*":
+        room_list = await _services.get_ros(db=db)
+        return templates.TemplateResponse('room_selection.html', context = {'request': request, 'docs_list': room_list, 'statusMessage' : statusMessage})
+
+    room_list = await _services.get_ros_by_name(ro_name = room_name, db = db)
+
+    if not room_list:
+        statusMessage = "No room found!"
+
+    return templates.TemplateResponse('room_selection.html', context = {'request': request, 'docs_list': room_list, 'statusMessage' : statusMessage})
+
+# Get all rooms - debug
+@app.get("/getall/rooms", status_code = 200)
+async def get_all_rooms(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    ros_list = await _services.get_ros(db = db)
+    return templates.TemplateResponse('room_display.html', context = {'request' : request, 'docs_list' : ros_list})

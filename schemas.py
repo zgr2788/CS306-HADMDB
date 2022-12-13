@@ -80,6 +80,7 @@ class Service(_ServiceCreate):
 #*********************************************************
 class _RoomCreate(_pydantic.BaseModel):
     size : int
+    name : str
 
     class Config:
         orm_mode = True 
@@ -87,6 +88,7 @@ class _RoomCreate(_pydantic.BaseModel):
 
 class Room(_RoomCreate):
     id : int
+    occupied : bool
 
 
     class Config:

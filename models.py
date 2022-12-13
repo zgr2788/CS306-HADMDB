@@ -76,6 +76,8 @@ class Room(_database.Base):
     __tablename__ = "rooms"
 
     #Columns
+    occupied = _sql.Column(_sql.Boolean, index = True, default = False) # Is room occupied
+    name = _sql.Column(_sql.String, index = True)  # Room name
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique rooms id - pkey
     size = _sql.Column(_sql.Integer, index = True)      # Room size
 

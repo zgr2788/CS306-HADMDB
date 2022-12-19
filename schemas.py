@@ -117,18 +117,3 @@ class Patient(_PatientCreate):
 
     class Config:
         orm_mode = True
-
-
-#*********************************************************
-
-# TREATMENT 
-
-#*********************************************************
-
-class Treatment(_pydantic.BaseModel):
-    billed_to : int
-    cost : int
-    name : str
-
-    class Config:
-        orm_mode = True 

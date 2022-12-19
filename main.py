@@ -436,7 +436,44 @@ async def get_all_patients(request: _fastapi.Request, db: _orm.Session = _fastap
 
 #*********************************************************
 
-@app.get("/billing/")
+# Get bill home
+@app.get("/billing/home")
 async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
     pats_list = await _services.get_pats(db = db)
     return templates.TemplateResponse('bill_treatments.html', context = {'request' : request, 'patients_list' : pats_list})
+
+# Get bill for patient
+@app.get("/billing/{pat_id}")
+async def bill_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    name = pat_db.name
+    id = pat_db.id
+    statusMessage = ""
+    return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage})
+
+# Set bill for patient
+@app.post("/billing/{pat_id}")
+async def bill_patient(request: _fastapi.Request, pat_id: int, name : str =  _fastapi.Form(), cost : str =  _fastapi.Form(),  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    try :
+        costNum = int(cost)
+    except :
+        statusMessage = "Please enter numeric value for treatment cost!"
+        return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage}) 
+    
+
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    pat_id = pat_db.id
+
+    trt = _models.Treatment(
+        name = name,
+        cost = cost,
+        billed_to = pat_id
+    )
+
+    db.add(trt)
+    db.commit()
+    db.refresh(trt)
+
+    statusMessage = "Successfully billed treatment " + str(name) + " to patient " + str(pat_db.name) + "."
+
+    return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage})

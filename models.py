@@ -111,7 +111,8 @@ class Treatment(_database.Base):
     __tablename__ = "treatments"
 
     #Columns
-    billed_to = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id', ondelete="CASCADE"), primary_key=True,  index = True)  # Unique patient.id for billed_to - fkey
+    id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique treatment id - pkey 
+    billed_to = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id', ondelete="CASCADE"),  index = True)  # Unique patient.id for billed_to - fkey
     cost = _sql.Column(_sql.Integer, index = True)      # Cost
     name = _sql.Column(_sql.String, index = True)      # Name
 

@@ -250,12 +250,12 @@ async def create_pat(pat : _schemas._RoomCreate, db : _orm.Session):
 
 # Delete pat
 async def delete_pat(pat_id : int , db : _orm.Session):
-    ro_db =  await get_ro_by_id(ro_id, db)
+    pat_db =  await get_pat_by_id(pat_id, db)
 
-    if ro_db is None:
-        raise _fastapi.HTTPException(status_code=404, detail = "Room ID not found in database!")
+    if pat_db is None:
+        raise _fastapi.HTTPException(status_code=404, detail = "Patient ID not found in database!")
 
-    db.delete(ro_db)
+    db.delete(pat_db)
     db.commit()
 
 # Get pats by name

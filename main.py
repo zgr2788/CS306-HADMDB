@@ -384,11 +384,11 @@ async def delete_patient(request: _fastapi.Request):
     return templates.TemplateResponse('patient_delete.html', context = {'request': request, 'statusMessage': statusMessage})
 
 @app.post("/delete/patients/", status_code = 204)
-async def delete_room(request : _fastapi.Request, patient_id : int = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+async def delete_patient(request : _fastapi.Request, patient_id : int = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
     pat_db = await _services.get_pat_by_id(patient_id, db)
 
     if not pat_db:
-        statusMessage = "Room with id " + str(patient_id) + " does not exist in database!"
+        statusMessage = "Patient with id " + str(patient_id) + " does not exist in database!"
 
     else:
         name = pat_db.name

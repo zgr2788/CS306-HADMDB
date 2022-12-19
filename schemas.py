@@ -111,6 +111,7 @@ class _PatientCreate(_pydantic.BaseModel):
 
 class Patient(_PatientCreate):
     id : int
+    treated_by: int
 
 
     class Config:

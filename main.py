@@ -259,12 +259,12 @@ async def get_all_services(request: _fastapi.Request, db: _orm.Session = _fastap
 # ROOMS
 
 #*********************************************************
-# Get service home
+# Get room home
 @app.get("/home/rooms/")
 async def home_room(request: _fastapi.Request):
     return templates.TemplateResponse('room_home.html', context = {'request' : request})
 
-# Create aroom
+# Create a room
 @app.get("/create/rooms/")
 async def create_room(request: _fastapi.Request):
     statusMessage = ""
@@ -333,3 +333,81 @@ async def get_rooms_by_name(request: _fastapi.Request, room_name : str = _fastap
 async def get_all_rooms(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
     ros_list = await _services.get_ros(db = db)
     return templates.TemplateResponse('room_display.html', context = {'request' : request, 'docs_list' : ros_list})
+
+
+
+#*********************************************************
+
+# PATIENTS
+
+#*********************************************************
+# Get patient home
+@app.get("/home/patients/")
+async def home_patient(request: _fastapi.Request):
+    return templates.TemplateResponse('patient_home.html', context = {'request' : request})
+
+# Create a patient
+@app.get("/create/patients/")
+async def create_patient(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/create/patients/")
+async def create_patient(request : _fastapi.Request, history : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    pat = _schemas._PatientCreate(
+        history = history,
+        name = name
+    )
+    new_pat = await _services.create_pat(pat, db)
+    statusMessage = "Successfully registered patient" + str(new_pat.name) + " with ID: " + str(new_pat.id) + "."
+    return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+# Delete a patient
+@app.get("/delete/patients/")
+async def delete_patient(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('patient_delete.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/delete/patients/", status_code = 204)
+async def delete_room(request : _fastapi.Request, patient_id : int = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(patient_id, db)
+
+    if not pat_db:
+        statusMessage = "Room with id " + str(patient_id) + " does not exist in database!"
+
+    else:
+        name = pat_db.name
+        await _services.delete_pat(pat_id = patient_id , db = db)
+        statusMessage = "Successfully deleted patient " + str(name) + " with ID: " + str(patient_id) + " from the database."
+
+    return templates.TemplateResponse('patient_delete.html', context = {'request': request, 'statusMessage' : statusMessage})
+
+# Get patients by name
+@app.get("/get/patients/")
+async def get_patients_by_name(request: _fastapi.Request):
+    statusMessage = ""
+    return templates.TemplateResponse('patient_selection.html', context = {'request': request, 'statusMessage': statusMessage})
+
+@app.post("/get/patients/", status_code = 200)
+async def get_patients_by_name(request: _fastapi.Request, patient_name : str = _fastapi.Form(), db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    statusMessage = ""
+
+    # Wildcard search
+    if patient_name == "*":
+        patient_list = await _services.get_pats(db=db)
+        return templates.TemplateResponse('patient_selection.html', context = {'request': request, 'docs_list': patient_list, 'statusMessage' : statusMessage})
+
+    patient_list = await _services.get_pats_by_name(pat_name = patient_name, db = db)
+
+    if not patient_list:
+        statusMessage = "No patients found!"
+
+    return templates.TemplateResponse('patient_selection.html', context = {'request': request, 'docs_list': patient_list, 'statusMessage' : statusMessage})
+
+# Get all rooms - debug
+@app.get("/getall/patients", status_code = 200)
+async def get_all_patients(request: _fastapi.Request, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    return templates.TemplateResponse('patient_display.html', context = {'request' : request, 'docs_list' : pats_list})
+
+

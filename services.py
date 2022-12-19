@@ -64,6 +64,12 @@ async def delete_doc(doc_id : int , db : _orm.Session):
 
     if doc_db is None:
         raise _fastapi.HTTPException(status_code=404, detail = "Doctor ID not found in database!")
+    
+    # Delete all patients of a doctor for cascade
+    pats = db.query(_models.Patient).filter(_models.Patient.treated_by == doc_db.id).all()
+
+    for pat in pats:
+        await delete_pat(pat.id, db)
 
     db.delete(doc_db)
     db.commit()

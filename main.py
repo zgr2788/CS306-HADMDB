@@ -426,3 +426,17 @@ async def get_all_patients(request: _fastapi.Request, db: _orm.Session = _fastap
     return templates.TemplateResponse('patient_display.html', context = {'request' : request, 'docs_list' : pats_list})
 
 
+
+
+
+
+#*********************************************************
+
+# TREATMENTS & BILLING
+
+#*********************************************************
+
+@app.get("/billing/")
+async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    return templates.TemplateResponse('bill_treatments.html', context = {'request' : request, 'patients_list' : pats_list})

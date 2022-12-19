@@ -370,7 +370,7 @@ async def create_patient(request : _fastapi.Request, assigned : str =  _fastapi.
     pat = _schemas._PatientCreate(
         history = history,
         name = name,
-        treated_by = assigned
+        treated_by = assigned_doc.id
     )
 
     new_pat = await _services.create_pat(pat, db)

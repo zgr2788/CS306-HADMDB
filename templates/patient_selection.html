@@ -35,10 +35,10 @@
     </style>
   
   <div class="login-box"; style="text-align:center;">
-    <h2>Search Rooms</h2>
+    <h2>Search Patients</h2>
     <div class="container">
       <form method="post">
-        <input type="search" name="room_name" placeholder="Search by name..." required="">
+        <input type="search" name="patient_name" placeholder="Search by name..." required="">
         <button type="submit">Search</button>
       </form>
     </div>
@@ -47,16 +47,16 @@
     <table width="325 px">
       <tr>
           <th width="81.25px">Name</th>
-          <th width="81.25px">Size</th>
           <th width="81.25px">ID</th>
-          <th width="81.25px">Occupied?</th>
+          <th width="81.25px">Attendee ID</th>
+          <th width="81.25px">History</th>
       </tr>
       {% for doc in docs_list %}
       <tr style="line-height: 24px">
           <td>{{ doc.name }}</td>
-          <td>{{ doc.size }}</td>
           <td>{{ doc.id }}</td>
-          <td>{{ doc.occupied|string }}</td>
+          <td>{{ doc.treated_by }}</td>
+          <td>{{ doc.history }}</td>
       </tr>
       {% endfor %}
     </table>
@@ -70,7 +70,7 @@
     {% endif %}
   
     <div class="container">
-      <form action="/home/rooms">
+      <form action="/home/patients">
         <a href="#"><button class="mybutton2">
           Back to Homepage
         </button></a>

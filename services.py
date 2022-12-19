@@ -239,7 +239,8 @@ async def create_pat(pat : _schemas._RoomCreate, db : _orm.Session):
     # New doctor object
     patObj = _models.Patient(
         name = pat.name,
-        history = pat.history  
+        history = pat.history, 
+        treated_by = pat.treated_by 
     )
 
     # Write to db
@@ -259,12 +260,12 @@ async def delete_pat(pat_id : int , db : _orm.Session):
     db.commit()
 
 # Get pats by name
-async def get_ros_by_name(pat_name : str, db : _orm.Session):
-    items = db.query(_models.Room).filter(_models.Room.name.contains(ro_name))
-    return list(map(_schemas.Room.from_orm, items))
+async def get_pats_by_name(pat_name : str, db : _orm.Session):
+    items = db.query(_models.Patient).filter(_models.Patient.name.contains(pat_name))
+    return list(map(_schemas.Patient.from_orm, items))
 
 # Get all pats
 async def get_pats(db : _orm.Session):
-    items = db.query(_models.Room).filter(_models.Room.name.contains(''))
-    return list(map(_schemas.Room.from_orm, items))
+    items = db.query(_models.Patient).filter(_models.Patient.name.contains(''))
+    return list(map(_schemas.Patient.from_orm, items))
 

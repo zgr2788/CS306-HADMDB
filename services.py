@@ -220,3 +220,51 @@ async def get_ros(db : _orm.Session):
     items = db.query(_models.Room).filter(_models.Room.name.contains(''))
     return list(map(_schemas.Room.from_orm, items))
 
+
+
+
+#*********************************************************
+
+# PATIENTS
+
+#*********************************************************
+
+# pat query by id
+async def get_pat_by_id(id : int, db : _orm.Session):
+    return db.query(_models.Patient).filter(_models.Patient.id == id).first()
+
+# Create new pat
+async def create_pat(pat : _schemas._RoomCreate, db : _orm.Session):
+        
+    # New doctor object
+    patObj = _models.Patient(
+        name = pat.name,
+        history = pat.history  
+    )
+
+    # Write to db
+    db.add(patObj)
+    db.commit()
+    db.refresh(patObj)
+    return patObj
+
+# Delete pat
+async def delete_pat(pat_id : int , db : _orm.Session):
+    ro_db =  await get_ro_by_id(ro_id, db)
+
+    if ro_db is None:
+        raise _fastapi.HTTPException(status_code=404, detail = "Room ID not found in database!")
+
+    db.delete(ro_db)
+    db.commit()
+
+# Get pats by name
+async def get_ros_by_name(pat_name : str, db : _orm.Session):
+    items = db.query(_models.Room).filter(_models.Room.name.contains(ro_name))
+    return list(map(_schemas.Room.from_orm, items))
+
+# Get all pats
+async def get_pats(db : _orm.Session):
+    items = db.query(_models.Room).filter(_models.Room.name.contains(''))
+    return list(map(_schemas.Room.from_orm, items))
+

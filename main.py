@@ -353,13 +353,28 @@ async def create_patient(request: _fastapi.Request):
     return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
 
 @app.post("/create/patients/")
-async def create_patient(request : _fastapi.Request, history : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+async def create_patient(request : _fastapi.Request, assigned : str =  _fastapi.Form(), history : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
+    print(assigned, history, name)
+    try :
+        assignedNum = int(assigned)
+    except :
+        statusMessage = "Please enter numeric value for assigned doctor ID!"
+        return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
+    assigned_doc = await _services.get_doc_by_id(assignedNum, db)
+
+    if not assigned_doc:
+        statusMessage = "Doctor ID not found in database!"
+        return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
+
     pat = _schemas._PatientCreate(
         history = history,
-        name = name
+        name = name,
+        treated_by = assigned
     )
+
     new_pat = await _services.create_pat(pat, db)
-    statusMessage = "Successfully registered patient" + str(new_pat.name) + " with ID: " + str(new_pat.id) + "."
+    statusMessage = "Successfully registered patient " + str(new_pat.name) + " under doctor " + str(assigned_doc.name) + "."
     return templates.TemplateResponse('patient_insert.html', context = {'request': request, 'statusMessage': statusMessage})
 
 # Delete a patient

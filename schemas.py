@@ -104,6 +104,7 @@ class Room(_RoomCreate):
 class _PatientCreate(_pydantic.BaseModel):
     name : str
     history : str
+    treated_by: int
 
     class Config:
         orm_mode = True 
@@ -111,7 +112,7 @@ class _PatientCreate(_pydantic.BaseModel):
 
 class Patient(_PatientCreate):
     id : int
-    treated_by: int
+    
 
 
     class Config:

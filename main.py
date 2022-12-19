@@ -432,12 +432,12 @@ async def get_all_patients(request: _fastapi.Request, db: _orm.Session = _fastap
 
 #*********************************************************
 
-# TREATMENTS & BILLING
+# TREATMENTS & BILLING - FIRST FUNCTIONALITY
 
 #*********************************************************
 
 # Get bill home
-@app.get("/billing/home")
+@app.get("/bill/home")
 async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
     pats_list = await _services.get_pats(db = db)
     return templates.TemplateResponse('bill_treatments.html', context = {'request' : request, 'patients_list' : pats_list})
@@ -477,3 +477,28 @@ async def bill_patient(request: _fastapi.Request, pat_id: int, name : str =  _fa
     statusMessage = "Successfully billed treatment " + str(name) + " to patient " + str(pat_db.name) + "."
 
     return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage})
+
+# Get bill check
+@app.get("/bill/check")
+async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    return templates.TemplateResponse('check_bills.html', context = {'request' : request, 'patients_list' : pats_list})
+
+
+# Get bills list for patient
+@app.get("/billcheck/{pat_id}")
+async def check_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    bills_list = db.query(_models.Treatment).filter(_models.Treatment.billed_to == pat_id).all()
+    name = pat_db.name
+    id = pat_db.id
+    total = sum([trt.cost for trt in bills_list])
+    return templates.TemplateResponse('bills_table_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'pat_treat_list' : bills_list, 'total' : total})
+
+
+
+#*********************************************************
+
+# ROOM STATUS AND ADMISSION - SECOND FUNCTIONALITY
+
+#*********************************************************

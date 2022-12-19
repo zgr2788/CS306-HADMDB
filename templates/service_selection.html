@@ -1,0 +1,77 @@
+<head>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+  </head>
+  
+  <style>
+    .mybutton2 {
+      position: relative;
+      padding: 4px 6px;
+      border: none;
+      background: transparent;
+      color: #03e9f4;
+      font-size: 12px;
+      margin-top: 5px;
+      letter-spacing: 2px;
+      cursor: pointer;
+    }
+    
+    .mybutton2:hover {
+      background: transparent;
+      color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 1px #03e9f4,
+                  0 0 5px #03e9f4,
+                  0 0 25px #03e9f4;
+    }
+    
+    .mybutton2 input:focus ~ button,
+    .mybutton2 input:valid ~ button {
+      top: -10px;
+      left: 0;
+      color: #03e9f4;
+      font-size: 12px;
+    }
+    
+    </style>
+  
+  <div class="login-box"; style="text-align:center;">
+    <h2>Search Personnel</h2>
+    <div class="container">
+      <form method="post">
+        <input type="search" name="service_name" placeholder="Search by name..." required="">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  
+    {% if docs_list -%}
+    <table width="325 px">
+      <tr>
+          <th width="108.3px">Name</th>
+          <th width="108.3px">Type</th>
+          <th width="108.3px">ID</th>
+      </tr>
+      {% for doc in docs_list %}
+      <tr style="line-height: 24px">
+          <td>{{ doc.name }}</td>
+          <td>{{ doc.type }}</td>
+          <td>{{ doc.id }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+   
+  
+    {% else -%}
+    <div class="container">
+      <p> {{statusMessage}} </p>
+    </div>
+  
+    {% endif %}
+  
+    <div class="container">
+      <form action="/home/services">
+        <a href="#"><button class="mybutton2">
+          Back to Homepage
+        </button></a>
+      </form>
+    </div>
+  </div>

@@ -283,6 +283,16 @@ async def delete_ro(ro_id : int , db : _orm.Session):
 
     if ro_db is None:
         raise _fastapi.HTTPException(status_code=404, detail = "Room ID not found in database!")
+    
+    if ro_db.occupied:
+        pat_id = ro_db.occupied_by
+        pat_db = await get_pat_by_id(pat_id,db)
+        pat_db.admitted_to = 0
+        
+        db.commit()
+        db.refresh(pat_db)
+
+
 
     db.delete(ro_db)
     db.commit()
@@ -332,6 +342,16 @@ async def delete_pat(pat_id : int , db : _orm.Session):
 
     if pat_db is None:
         raise _fastapi.HTTPException(status_code=404, detail = "Patient ID not found in database!")
+
+    if pat_db.admitted_to:
+        ro_id = pat_db.admitted_to
+        ro_db = await get_ro_by_id(ro_id, db)
+
+        ro_db.occupied = False
+        ro_db.occupied_by = 0
+        
+        db.commit()
+        db.refresh(ro_db)
 
     db.delete(pat_db)
     db.commit()

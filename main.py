@@ -566,3 +566,32 @@ async def home_discharge(request: _fastapi.Request,  db: _orm.Session = _fastapi
             admitted_pats.append(pat)
     
     return templates.TemplateResponse('discharge_rooms.html', context = {'request' : request, 'pats_list' : admitted_pats})
+
+# Get discharge confimation
+@app.get("/admission/discharge/confirm/{pat_id}")
+async def discharging_patient(request: _fastapi.Request, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(pat_db.admitted_to, db)
+    statusMessage = "Are you sure you want to discharge " + pat_db.name + " from " + room_db.name + "?"
+    return templates.TemplateResponse('discharge_areyousure.html', context = {'request' : request, 'pat_id' : pat_id, 'room_id': room_db.id, 'room_name' : room_db.name, 'pat_name' : pat_db.name, 'statusMessage' : statusMessage})
+
+# Confirm discharge, post method
+@app.post("/admission/discharge/confirm/{pat_id}")
+async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    
+    # Get pat and room
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(pat_db.admitted_to, db)
+
+    # Discharge both
+    pat_db.admitted_to = 0
+    room_db.occupied_by = 0
+    room_db.occupied = False
+
+
+    db.commit()
+    db.refresh(pat_db)
+    db.refresh(room_db)
+
+    statusMessage = "Successfully discharged " + pat_db.name + " from " + room_db.name + "!"
+    return templates.TemplateResponse('discharge_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})

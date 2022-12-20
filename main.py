@@ -362,7 +362,6 @@ async def create_patient(request: _fastapi.Request):
 
 @app.post("/create/patients/")
 async def create_patient(request : _fastapi.Request, assigned : str =  _fastapi.Form(), history : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
-    print(assigned, history, name)
     try :
         assignedNum = int(assigned)
     except :
@@ -513,9 +512,8 @@ async def check_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session
 
 # Get Admission Home
 @app.get("/admission/home")
-async def home_rome(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+async def home_room_admit(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
     rooms_list = await _services.get_ros(db = db)
-    print(rooms_list)
     return templates.TemplateResponse('admit_rooms.html', context = {'request' : request, 'rooms_list' : rooms_list})
 
 # Get admit for room
@@ -545,9 +543,6 @@ async def admitted_patient(request: _fastapi.Request, room_id: int, pat_id : int
     room_db = await _services.get_ro_by_id(room_id, db)
 
     # Admit and connect both
-    print(room_db.id)
-    print(pat_db.id)
-    print(pat_db.admitted_to)
     pat_db.admitted_to = room_db.id
     room_db.occupied_by = pat_db.id
     room_db.occupied = True
@@ -556,8 +551,18 @@ async def admitted_patient(request: _fastapi.Request, room_id: int, pat_id : int
     db.commit()
     db.refresh(pat_db)
     db.refresh(room_db)
-    print(pat_db.admitted_to)
 
     statusMessage = "Successfully admitted " + pat_db.name + " to " + room_db.name + "!"
     return templates.TemplateResponse('admitting_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})
 
+# Get Discharge Home
+@app.get("/admission/discharge")
+async def home_discharge(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    
+    admitted_pats = []
+    for pat in pats_list:
+        if pat.admitted_to != 0:
+            admitted_pats.append(pat)
+    
+    return templates.TemplateResponse('discharge_rooms.html', context = {'request' : request, 'pats_list' : admitted_pats})

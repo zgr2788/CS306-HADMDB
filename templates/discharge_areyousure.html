@@ -71,21 +71,26 @@
       <h2>{{ statusMessage }}</h2>
       {% if pat_id -%}
       <h4>Discharge Transaction Details:</h4>
-      <p>Room ID: {{  }} - Patient ID: {{ pat_id }}</p>
+      <p>Room ID: {{ room_id }} - Patient ID: {{ pat_id }}</p>
       <form method = "post">
-        <a href="#"><button class="delete">
+        <a href="#"><button class="mybutton">
           Confirm Discharge
         </button></a>
       </form>
       <form action = "/admission/discharge">
-        <a href="#"><button class="delete">
+        <a href="#"><button class="mybutton">
           Go Back
         </button></a>
       </form>
       {% else -%}
       <form action = "/admission/discharge">
-        <a href="#"><button class="delete">
+        <a href="#"><button class="mybutton">
           Back To Discharge Table
+        </button></a>
+      </form>
+      <form action="/">
+        <a href="#"><button class="mybutton">
+          Back To Home
         </button></a>
       </form>
       {% endif %}

@@ -73,19 +73,24 @@
       <h4>Admission Transaction Details:</h4>
       <p>Room ID: {{ room_id }} - Patient ID: {{ pat_id }}</p>
       <form method = "post">
-        <a href="#"><button class="delete">
+        <a href="#"><button class="mybutton">
           Confirm Admission
         </button></a>
       </form>
       <form action = "/admitting/{{ room_id }}">
-        <a href="#"><button class="delete">
+        <a href="#"><button class="mybutton">
           Go Back
         </button></a>
       </form>
       {% else -%}
       <form action = "/admission/home">
-        <a href="#"><button class="delete">
-          Back To Admission Home
+        <a href="#"><button class="mybutton">
+          Back To Admission Table
+        </button></a>
+      </form>
+      <form action="/">
+        <a href="#"><button class="mybutton">
+          Back To Home
         </button></a>
       </form>
       {% endif %}

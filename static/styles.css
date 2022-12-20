@@ -12,7 +12,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 400px;
+  width: 1000px;
   padding: 40px;
   transform: translate(-50%, -50%);
   background: rgba(0,0,0,.5);
@@ -22,6 +22,13 @@ body {
 }
 
 .login-box h2 {
+  margin: 0 0 30px;
+  padding: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.login-box h4 {
   margin: 0 0 30px;
   padding: 0;
   color: #fff;
@@ -111,6 +118,8 @@ td{
   color : white;
   border: 1px solid white;
   border-collapse: collapse;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 th{
@@ -123,6 +132,8 @@ th{
 table{
   border: 1px solid white;
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 915px;
 }
 
 input[type="search"]::placeholder {

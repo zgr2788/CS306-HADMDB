@@ -19,6 +19,14 @@ app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static"
 
 templates = _templates.Jinja2Templates(directory = "templates")
 
+# On startup, add random data for the database
+@app.on_event("startup")
+async def startup():
+    
+    # If database is empty
+    if await _services.get_docs(_database.SessionLocal()) == []:
+        await _services.insert_dummy_data(_database.SessionLocal())
+    return 0
 
 # Main page
 @app.get("/")
@@ -354,7 +362,6 @@ async def create_patient(request: _fastapi.Request):
 
 @app.post("/create/patients/")
 async def create_patient(request : _fastapi.Request, assigned : str =  _fastapi.Form(), history : str =  _fastapi.Form(), name : str = _fastapi.Form(), db:_orm.Session = _fastapi.Depends(_services.get_db)):
-    print(assigned, history, name)
     try :
         assignedNum = int(assigned)
     except :
@@ -426,3 +433,165 @@ async def get_all_patients(request: _fastapi.Request, db: _orm.Session = _fastap
     return templates.TemplateResponse('patient_display.html', context = {'request' : request, 'docs_list' : pats_list})
 
 
+
+
+
+
+#*********************************************************
+
+# TREATMENTS & BILLING - FIRST FUNCTIONALITY
+
+#*********************************************************
+
+# Get bill home
+@app.get("/bill/home")
+async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    return templates.TemplateResponse('bill_treatments.html', context = {'request' : request, 'patients_list' : pats_list})
+
+# Get bill for patient
+@app.get("/billing/{pat_id}")
+async def bill_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    name = pat_db.name
+    id = pat_db.id
+    statusMessage = ""
+    return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage})
+
+# Set bill for patient
+@app.post("/billing/{pat_id}")
+async def bill_patient(request: _fastapi.Request, pat_id: int, name : str =  _fastapi.Form(), cost : str =  _fastapi.Form(),  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    try :
+        costNum = int(cost)
+    except :
+        statusMessage = "Please enter numeric value for treatment cost!"
+        return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage}) 
+    
+
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    pat_id = pat_db.id
+
+    trt = _models.Treatment(
+        name = name,
+        cost = cost,
+        billed_to = pat_id
+    )
+
+    db.add(trt)
+    db.commit()
+    db.refresh(trt)
+
+    statusMessage = "Successfully billed treatment " + str(name) + " to patient " + str(pat_db.name) + "."
+
+    return templates.TemplateResponse('bill_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'statusMessage' : statusMessage})
+
+# Get bill check
+@app.get("/bill/check")
+async def home_billing(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    return templates.TemplateResponse('check_bills.html', context = {'request' : request, 'patients_list' : pats_list})
+
+
+# Get bills list for patient
+@app.get("/billcheck/{pat_id}")
+async def check_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    bills_list = db.query(_models.Treatment).filter(_models.Treatment.billed_to == pat_id).all()
+    name = pat_db.name
+    id = pat_db.id
+    total = sum([trt.cost for trt in bills_list])
+    return templates.TemplateResponse('bills_table_patient.html', context = {'request' : request, 'patient_id' : id, 'patient_name' : name, 'pat_treat_list' : bills_list, 'total' : total})
+
+
+
+#*********************************************************
+
+# ROOM STATUS AND ADMISSION - SECOND FUNCTIONALITY
+
+#*********************************************************
+
+# Get Admission Home
+@app.get("/admission/home")
+async def home_room_admit(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    rooms_list = await _services.get_ros(db = db)
+    return templates.TemplateResponse('admit_rooms.html', context = {'request' : request, 'rooms_list' : rooms_list})
+
+# Get admit for room
+@app.get("/admitting/{room_id}")
+async def admit_patient(request: _fastapi.Request, room_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    ro_db = await _services.get_ro_by_id(room_id, db)
+    pats_list = await _services.get_pats(db)
+    name = ro_db.name
+    id = ro_db.id
+    statusMessage = ""
+    return templates.TemplateResponse('admitting_patient.html', context = {'request' : request, 'room_id' : room_id, 'patients_list' : pats_list, 'room_name' : name, 'statusMessage' : statusMessage})
+
+# Get admit confirmation
+@app.get("/admitting/{room_id}/{pat_id}")
+async def admitting_patient(request: _fastapi.Request, room_id: int, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(room_id, db)
+    statusMessage = "Are you sure you want to admit " + pat_db.name + " to " + room_db.name + "?"
+    return templates.TemplateResponse('admitting_areyousure.html', context = {'request' : request, 'room_id' : room_id, 'pat_id' : pat_id, 'room_name' : room_db.name, 'pat_name' : pat_db.name, 'statusMessage' : statusMessage})
+
+# Confirm admission, post method
+@app.post("/admitting/{room_id}/{pat_id}")
+async def admitted_patient(request: _fastapi.Request, room_id: int, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    
+    # Get pat and room
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(room_id, db)
+
+    # Admit and connect both
+    pat_db.admitted_to = room_db.id
+    room_db.occupied_by = pat_db.id
+    room_db.occupied = True
+
+
+    db.commit()
+    db.refresh(pat_db)
+    db.refresh(room_db)
+
+    statusMessage = "Successfully admitted " + pat_db.name + " to " + room_db.name + "!"
+    return templates.TemplateResponse('admitting_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})
+
+# Get Discharge Home
+@app.get("/admission/discharge")
+async def home_discharge(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pats_list = await _services.get_pats(db = db)
+    
+    admitted_pats = []
+    for pat in pats_list:
+        if pat.admitted_to != 0:
+            admitted_pats.append(pat)
+    
+    return templates.TemplateResponse('discharge_rooms.html', context = {'request' : request, 'pats_list' : admitted_pats})
+
+# Get discharge confimation
+@app.get("/admission/discharge/confirm/{pat_id}")
+async def discharging_patient(request: _fastapi.Request, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(pat_db.admitted_to, db)
+    statusMessage = "Are you sure you want to discharge " + pat_db.name + " from " + room_db.name + "?"
+    return templates.TemplateResponse('discharge_areyousure.html', context = {'request' : request, 'pat_id' : pat_id, 'room_id': room_db.id, 'room_name' : room_db.name, 'pat_name' : pat_db.name, 'statusMessage' : statusMessage})
+
+# Confirm discharge, post method
+@app.post("/admission/discharge/confirm/{pat_id}")
+async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    
+    # Get pat and room
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(pat_db.admitted_to, db)
+
+    # Discharge both
+    pat_db.admitted_to = 0
+    room_db.occupied_by = 0
+    room_db.occupied = False
+
+
+    db.commit()
+    db.refresh(pat_db)
+    db.refresh(room_db)
+
+    statusMessage = "Successfully discharged " + pat_db.name + " from " + room_db.name + "!"
+    return templates.TemplateResponse('discharge_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})

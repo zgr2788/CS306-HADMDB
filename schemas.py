@@ -89,6 +89,7 @@ class _RoomCreate(_pydantic.BaseModel):
 class Room(_RoomCreate):
     id : int
     occupied : bool
+    occupied_by : int
 
 
     class Config:
@@ -112,23 +113,9 @@ class _PatientCreate(_pydantic.BaseModel):
 
 class Patient(_PatientCreate):
     id : int
+    admitted_to : int
     
 
 
     class Config:
         orm_mode = True
-
-
-#*********************************************************
-
-# TREATMENT 
-
-#*********************************************************
-
-class Treatment(_pydantic.BaseModel):
-    billed_to : int
-    cost : int
-    name : str
-
-    class Config:
-        orm_mode = True 

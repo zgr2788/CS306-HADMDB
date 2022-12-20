@@ -34,51 +34,37 @@
     
     </style>
   
-  <div class="login-box"; style="text-align:center;">
-    <h2>Search Rooms</h2>
-    <div class="container">
-      <form method="post">
-        <input type="search" name="room_name" placeholder="Search by name..." required="">
-        <button type="submit">Search</button>
-      </form>
-    </div>
-  
-    {% if docs_list -%}
-    <table width="325 px">
+  <div class="login-box">
+    <h2>Recorded Bills for Patient: {{ patient_name }}</h2>
+
+    {% if pat_treat_list -%}
+    <table width="300 px">
       <tr>
-          <th width="81.25px">Name</th>
-          <th width="81.25px">Size</th>
-          <th width="81.25px">ID</th>
-          <th width="81.25px">Occupied?</th>
-          <th width="81.25px">Occupied By</th>
+          <th width="100px">Name</th>
+          <th width="100px">Cost</th>
       </tr>
-      {% for doc in docs_list %}
+      {% for treat in pat_treat_list %}
       <tr style="line-height: 24px">
-          <td>{{ doc.name }}</td>
-          <td>{{ doc.size }}</td>
-          <td>{{ doc.id }}</td>
-          <td>{{ doc.occupied|string }}</td>
-          {% if doc.occupied_by -%}
-          <td>{{ doc.occupied_by }}</td>
-          {% else -%}
-          <td>None</td>
-          {% endif %}
+          <td>{{ treat.name }}</td>
+          <td>{{ treat.cost }}</td>
       </tr>
       {% endfor %}
     </table>
    
+    <p>Total Amount Due: {{ total }}</p>
   
     {% else -%}
     <div class="container">
-      <p> {{statusMessage}} </p>
+      <p> No bills have been registered for this patient yet! </p>
     </div>
   
     {% endif %}
   
+    
     <div class="container">
-      <form action="/home/rooms">
+      <form action="/bill/check">
         <a href="#"><button class="mybutton2">
-          Back to Homepage
+          Back to Patient List
         </button></a>
       </form>
     </div>

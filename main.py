@@ -510,7 +510,22 @@ async def check_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session
 # ROOM STATUS AND ADMISSION - SECOND FUNCTIONALITY
 
 #*********************************************************
-@app.get("/room/home")
+
+# Get Admission Home
+@app.get("/admission/home")
 async def home_rome(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
     rooms_list = await _services.get_ros(db = db)
     return templates.TemplateResponse('admit_rooms.html', context = {'request' : request, 'rooms_list' : rooms_list})
+
+# Get admit for room
+@app.get("/admitting/{room_id}")
+async def admit_patient(request: _fastapi.Request, room_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    ro_db = await _services.get_ro_by_id(room_id, db)
+    pats_list = await _services.get_pats(db)
+    name = ro_db.name
+    id = ro_db.id
+    statusMessage = ""
+    return templates.TemplateResponse('admitting_patient.html', context = {'request' : request, 'room_id' : room_id, 'patients_list' : pats_list, 'room_name' : name, 'statusMessage' : statusMessage})
+
+#@app.get("/admitting/{room_id}/{pat_id}")
+#async def admit_patient(request: _fastapi.Request, room_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):

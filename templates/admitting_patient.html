@@ -1,0 +1,174 @@
+<head>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+  </head>
+  
+  <style>
+    .mybutton2 {
+      position: relative;
+      padding: 4px 6px;
+      border: none;
+      background: transparent;
+      color: #03e9f4;
+      font-size: 12px;
+      margin-top: 5px;
+      letter-spacing: 2px;
+      cursor: pointer;
+    }
+    
+    .mybutton2:hover {
+      background: transparent;
+      color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 1px #03e9f4,
+                  0 0 5px #03e9f4,
+                  0 0 25px #03e9f4;
+    }
+    
+    .mybutton2 input:focus ~ button,
+    .mybutton2 input:valid ~ button {
+      top: -10px;
+      left: 0;
+      color: #03e9f4;
+      font-size: 12px;
+    }
+    
+    .login-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1200px;
+  padding: 40px;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,.5);
+  box-sizing: border-box;
+  box-shadow: 0 15px 25px rgba(0,0,0,.6);
+  border-radius: 10px;
+}
+
+.login-box h2 {
+  margin: 0 0 30px;
+  padding: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.login-box .user-box {
+  position: relative;
+}
+
+.login-box .user-box input {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 30px;
+  border: none;
+  border-bottom: 1px solid #fff;
+  outline: none;
+  background: transparent;
+}
+.login-box .user-box label {
+  position: absolute;
+  top:0;
+  left: 0;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #fff;
+  pointer-events: none;
+  transition: .5s;
+}
+
+.login-box .user-box input:focus ~ label,
+.login-box .user-box input:valid ~ label {
+  top: -20px;
+  left: 0;
+  color: #03e9f4;
+  font-size: 12px;
+}
+
+.login-box form a {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  color: #03e9f4;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: .5s;
+  margin-top: 5px;
+  letter-spacing: 4px
+}
+
+.login-box a:hover {
+  background: #03e9f4;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #03e9f4,
+              0 0 25px #03e9f4,
+              0 0 50px #03e9f4,
+              0 0 100px #03e9f4;
+}
+
+.login-box a span {
+  position: absolute;
+  display: block;
+}
+
+    </style>
+  
+  <div class="login-box">
+    <h2>Select Patient to Admit Into : {{ room_name }} - ID: {{ room_id }}</h2>
+
+    {% if patients_list -%}
+    <table width="1120 px">
+      <tr>
+          <th width="224px">Name</th>
+          <th width="224px">ID</th>
+          <th width="224px">Attendee ID</th>
+          <th width="224px">History</th>
+          <th width="224px">Admitted To / Action</th>
+      </tr>
+      {% for pat in patients_list %}
+      <tr style="line-height: 24px">
+          <td>{{ pat.name }}</td>
+          <td>{{ pat.id }}</td>
+          <td>{{ pat.treated_by }}</td>
+          <td>{{ pat.history }}</td>
+          {% if pat.admitted_to -%}
+          <td>{{ pat.admitted_to }}</td>
+          {% else -%}
+          <td>
+            <form action="/admitting/{{ room_id }}/{{ pat.id }}">
+                <a href="#">
+                    <button class = "mybutton2" >
+                        Admit Patient
+                    </button>
+                </a>
+            </form>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </table>
+   
+  
+    {% else -%}
+    <div class="container">
+      <p> No patients registered yet! </p>
+    </div>
+  
+    {% endif %}
+
+  
+    <p>{{ statusMessage }}</p>
+  
+    
+    <div class="container">
+      <form action="/admission/home">
+        <a href="#"><button class="mybutton2">
+          Back to Admission Interface
+        </button></a>
+      </form>
+    </div>
+  </div>

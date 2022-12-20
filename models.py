@@ -76,6 +76,7 @@ class Room(_database.Base):
     __tablename__ = "rooms"
 
     #Columns
+    occupied_by = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id', ondelete="CASCADE"),  index = True)  # Unique patient.id for occupation of room - fkey
     occupied = _sql.Column(_sql.Boolean, index = True, default = False) # Is room occupied
     name = _sql.Column(_sql.String, index = True)  # Room name
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique rooms id - pkey

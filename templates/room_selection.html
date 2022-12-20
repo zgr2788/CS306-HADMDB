@@ -50,6 +50,7 @@
           <th width="81.25px">Size</th>
           <th width="81.25px">ID</th>
           <th width="81.25px">Occupied?</th>
+          <th width="81.25px">Occupied By</th>
       </tr>
       {% for doc in docs_list %}
       <tr style="line-height: 24px">
@@ -57,6 +58,11 @@
           <td>{{ doc.size }}</td>
           <td>{{ doc.id }}</td>
           <td>{{ doc.occupied|string }}</td>
+          {% if doc.occupied_by -%}
+          <td>{{ doc.occupied_by }}</td>
+          {% else -%}
+          <td>None</td>
+          {% endif %}
       </tr>
       {% endfor %}
     </table>

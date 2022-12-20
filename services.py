@@ -31,7 +31,78 @@ def get_db():
         db.close()
 
 
+# Insert some doctors, nurses, rooms, personnel and patients
+async def insert_dummy_data(db : _orm.Session):
+    
+    # Doctors
+    docNames = ["Gus Fring", "Michael Scott", "Yamac Kocovali", "Ramiz Karaeski", "Ezel Bayraktar", "Mahmut Orhan", "Ismet Inonu"]
+    docSpecs = ["Heart Surgeon", "ENT Specialist", "Ophthalmologist", "Dermatologist", "Urologist", "ENT Specialist", "Dermatologist"]
 
+    for i in range(len(docNames)):
+        docObj = _models.Doctor(
+        name = docNames[i],
+        spec = docSpecs[i]  
+        )
+        db.add(docObj)
+        db.commit()
+        db.refresh(docObj)
+    
+    # Nurses
+    nurseNames = ["Florence Nightingale", "Dorothea Dix", "Margaret Sanger", "Virginia Henderson", "Clara Barton", "Mary Eliza Mahoney", "Mary Breckinridge"]
+    
+    for i in range(len(nurseNames)):
+        nurObj = _models.Nurse(
+        name = nurseNames[i]  
+        )
+        db.add(nurObj)
+        db.commit()
+        db.refresh(nurObj)
+    
+    # Personnel
+    perNames = ["Walter White", "Jesse Pinkman", "Mike Ehrmantraut", "Jimmy McGill", "Patrick Bateman", "Jack Napier", "Antonio Montana"]
+    perSpecs = ["Cook", "Cook", "Security Specialist", "Legal Advisor", "Financial Advisor", "Workspace Ethics Advisor", "Security Specialist"]
+
+    for i in range(len(perNames)):
+        
+        perObj = _models.Service(
+        name = perNames[i],
+        type = perSpecs[i]  
+        )
+
+        db.add(perObj)
+        db.commit()
+        db.refresh(perObj)
+
+    # Rooms
+    roNames = ["White Room", "Blue Room", "Red Room", "Pink Room", "Purple Room", "Orange Room", "Black Room"]
+    roSizes = [250, 350, 270, 450, 160, 580, 330]
+
+    for i in range(len(roNames)):
+      
+      roObj = _models.Room(
+      name = roNames[i],
+      size = roSizes[i]  
+      )
+      db.add(roObj)
+      db.commit()
+      db.refresh(roObj)
+
+    # Patients
+    patNames = ["Thomas Shelby", "Arthur Shelby", "John Shelby", "Ragnar Lothbrok", "Bjorn Lothbrok", "Miles Morales", "Michelle Obama"]
+    patHist = ["Heart Attack", "Nosebleed", "Astigmatism + Myopia", "Vitiligo", "Syphilis", "Runny Nose", "Eczema"]
+    patTreatBy = [1, 2, 3, 4, 5, 6, 7]
+
+    for i in range(len(patNames)):
+      
+      patObj = _models.Patient(
+      name = patNames[i],
+      history = patHist[i],
+      treated_by = patTreatBy[i]  
+      )
+
+      db.add(patObj)
+      db.commit()
+      db.refresh(patObj) 
 
 #*********************************************************
 

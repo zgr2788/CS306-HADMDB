@@ -19,6 +19,14 @@ app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static"
 
 templates = _templates.Jinja2Templates(directory = "templates")
 
+# On startup, add random data for the database
+@app.on_event("startup")
+async def startup():
+    
+    # If database is empty
+    if await _services.get_docs(_database.SessionLocal()) == []:
+        await _services.insert_dummy_data(_database.SessionLocal())
+    return 0
 
 # Main page
 @app.get("/")

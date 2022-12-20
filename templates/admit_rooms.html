@@ -171,7 +171,7 @@
             <td>{{ room.size }}</td>
             <td>{{ room.id }}</td>
             <td>{{ room.occupied|string }}</td>
-            {% if room.occupied_by -%}
+            {% if room.occupied -%}
             <td>{{ room.occupied_by }}</td>
             {% else -%}
             <td>

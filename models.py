@@ -76,7 +76,7 @@ class Room(_database.Base):
     __tablename__ = "rooms"
 
     #Columns
-    occupied_by = _sql.Column(_sql.Integer, _sql.ForeignKey('patients.id', ondelete="CASCADE"),  index = True)  # Unique patient.id for occupation of room - fkey
+    occupied_by = _sql.Column(_sql.Integer,  index = True, default = 0)  # Unique patient.id for occupation of room - fkey - constraint enforced via dbms
     occupied = _sql.Column(_sql.Boolean, index = True, default = False) # Is room occupied
     name = _sql.Column(_sql.String, index = True)  # Room name
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique rooms id - pkey
@@ -95,8 +95,8 @@ class Patient(_database.Base):
     __tablename__ = "patients"
 
     #Columns
-    admitted_to = _sql.Column(_sql.Integer, _sql.ForeignKey('rooms.id', ondelete="CASCADE"),  index = True)  # Unique patient.id for occupation of room - fkey
-    treated_by = _sql.Column(_sql.Integer, _sql.ForeignKey('doctors.id', ondelete="CASCADE"),  index = True)  # Unique doctor_id for treatment
+    admitted_to = _sql.Column(_sql.Integer,  index = True, default = 0)  # Unique room_id for occupation of room - fkey - constraint enforced via dbms
+    treated_by = _sql.Column(_sql.Integer, _sql.ForeignKey('doctors.id', ondelete="CASCADE"),  index = True)  # Unique doctor_id for treatment - fkey
     id = _sql.Column(_sql.Integer, primary_key = True, index = True)  # Unique patient id - pkey
     history = _sql.Column(_sql.String, index = True)      # History
     name = _sql.Column(_sql.String, index = True)      # Name

@@ -515,6 +515,7 @@ async def check_patient(request: _fastapi.Request, pat_id: int, db: _orm.Session
 @app.get("/admission/home")
 async def home_rome(request: _fastapi.Request,  db: _orm.Session = _fastapi.Depends(_services.get_db)):
     rooms_list = await _services.get_ros(db = db)
+    print(rooms_list)
     return templates.TemplateResponse('admit_rooms.html', context = {'request' : request, 'rooms_list' : rooms_list})
 
 # Get admit for room
@@ -527,5 +528,36 @@ async def admit_patient(request: _fastapi.Request, room_id: int, db: _orm.Sessio
     statusMessage = ""
     return templates.TemplateResponse('admitting_patient.html', context = {'request' : request, 'room_id' : room_id, 'patients_list' : pats_list, 'room_name' : name, 'statusMessage' : statusMessage})
 
-#@app.get("/admitting/{room_id}/{pat_id}")
-#async def admit_patient(request: _fastapi.Request, room_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+# Get admit confirmation
+@app.get("/admitting/{room_id}/{pat_id}")
+async def admitting_patient(request: _fastapi.Request, room_id: int, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(room_id, db)
+    statusMessage = "Are you sure you want to admit " + pat_db.name + " to " + room_db.name + "?"
+    return templates.TemplateResponse('admitting_areyousure.html', context = {'request' : request, 'room_id' : room_id, 'pat_id' : pat_id, 'room_name' : room_db.name, 'pat_name' : pat_db.name, 'statusMessage' : statusMessage})
+
+# Confirm admission, post method
+@app.post("/admitting/{room_id}/{pat_id}")
+async def admitted_patient(request: _fastapi.Request, room_id: int, pat_id : int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
+    
+    # Get pat and room
+    pat_db = await _services.get_pat_by_id(pat_id, db)
+    room_db = await _services.get_ro_by_id(room_id, db)
+
+    # Admit and connect both
+    print(room_db.id)
+    print(pat_db.id)
+    print(pat_db.admitted_to)
+    pat_db.admitted_to = room_db.id
+    room_db.occupied_by = pat_db.id
+    room_db.occupied = True
+
+
+    db.commit()
+    db.refresh(pat_db)
+    db.refresh(room_db)
+    print(pat_db.admitted_to)
+
+    statusMessage = "Successfully admitted " + pat_db.name + " to " + room_db.name + "!"
+    return templates.TemplateResponse('admitting_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})
+

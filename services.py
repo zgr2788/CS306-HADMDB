@@ -7,11 +7,15 @@ import models as _models
 import schemas as _schemas
 import sqlalchemy.orm as _orm
 import sqlalchemy as _sql
-import json as _json
 import fastapi as _fastapi
+import fastapi.security as _security
+import jwt as _jwt
+import json as _json
 import datetime as _dt
 from dateutil import tz as _tz
 
+JWT_SECRET_ADMIN = 'ADMINSECRETHADMDB'
+adminJWT = {'name' : 'admin', 'password' : 'admin123'} # standard admin password
 
 # Define timezones
 from_zone = _tz.gettz('UTC')
@@ -30,6 +34,15 @@ def get_db():
     finally:
         db.close()
 
+# Auth for admin
+async def auth_admin(password : str):
+    if password==adminJWT('password'):
+        token = _jwt.encode(_json.loads(_json.dumps(adminJWT, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)
+        return token, True
+    
+    else:
+        token = 'Wrong password!'
+        return token, False 
 
 # Insert some doctors, nurses, rooms, personnel and patients
 async def insert_dummy_data(db : _orm.Session):

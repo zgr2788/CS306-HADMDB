@@ -3,11 +3,16 @@
 # @zgr2788
 
 import fastapi as _fastapi
+from typing import Union
 import fastapi.templating as _templates
 import fastapi.staticfiles as _StaticFiles
 import sqlalchemy.orm as _orm
 import services as _services, schemas as _schemas, models as _models, database as _database
 import jinja2 as _jinja2
+import fastapi.security as _security
+import jwt as _jwt
+import json as _json
+import random as _rnd
 from typing import List
 
 
@@ -18,6 +23,7 @@ _services.create_database()
 app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static")
 
 templates = _templates.Jinja2Templates(directory = "templates")
+JWT_SECRET_ADMIN = 'ADMINSECRETHADMDB'
 
 # On startup, add random data for the database
 @app.on_event("startup")
@@ -595,3 +601,28 @@ async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.S
 
     statusMessage = "Successfully discharged " + pat_db.name + " from " + room_db.name + "!"
     return templates.TemplateResponse('discharge_areyousure.html', context = {'request' : request, 'statusMessage' : statusMessage})
+
+
+
+#*********************************************************
+
+# MESSAGE BOARD
+
+#*********************************************************
+@app.get("/messageboard")
+async def messageboard(request: _fastapi.Request, account_type: Union[str, None] = _fastapi.Cookie(default=None), guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
+    acc_type = ""
+    guest_nam = None
+    resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+    
+    if not account_type == "Admin":
+        acc_type = "Guest"
+        if guest_name:
+            guest_nam = guest_name
+        resp.set_cookie(key='account_type', value='Guest')
+        resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'sessionID' : str(_rnd.randint(10000000000000, 1000000000000000000000000))}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))
+    
+    else:
+        acc_type = "Admin"
+
+    return resp

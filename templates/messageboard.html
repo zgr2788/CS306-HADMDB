@@ -1,0 +1,87 @@
+<head>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+  </head>
+  
+  <style>
+  .mybutton {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 16px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    letter-spacing: 4px;
+    cursor: pointer;
+  }
+  
+  .mybutton:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 5px #03e9f4,
+                0 0 25px #03e9f4,
+                0 0 50px #03e9f4,
+                0 0 100px #03e9f4;
+  }
+  
+  .mybutton input:focus ~ button,
+  .mybutton input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
+  
+  </style>
+  
+  <body>
+  
+    <div class="login-box"; style="text-align:center;">
+      {% if acc_type == 'Guest' -%}
+        <h2>Message Board - Guest</h2>
+      {% if guest_nam is not none -%}
+      <form method = "post">
+        <div class="user-box">
+          <input type="text" name="name" required="">
+          <label>Write Name Here</label>
+        </div>
+        <a href="#"><button type="submit">
+          Set Name
+        </button></a>
+      </form>
+      {% endif %}
+
+            
+      <form action="/message/post">
+        <a href="#"><button class="mybutton">
+          Post New Message
+        </button></a>
+      </form>
+
+      <form action="/message/check">
+        <a href="#"><button class="mybutton">
+          Check Messages with Admin
+        </button></a>
+      </form>
+
+      <form action="/admission/home">
+        <a href="#"><button class="mybutton">
+          Admit Patients To Rooms
+        </button></a>
+      </form>
+
+      <form action="/admission/discharge">
+        <a href="#"><button class="mybutton">
+          Discharge Patients
+        </button></a>
+      </form>
+
+      
+    </div>
+  
+  </body>
+  
+  
+  

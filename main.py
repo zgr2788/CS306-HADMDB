@@ -611,18 +611,19 @@ async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.S
 #*********************************************************
 @app.get("/messageboard")
 async def messageboard(request: _fastapi.Request, account_type: Union[str, None] = _fastapi.Cookie(default=None), guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
-    acc_type = ""
-    guest_nam = None
-    resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
-    
+
     if not account_type == "Admin":
         acc_type = "Guest"
+        guest_nam = None
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
         if guest_name:
             guest_nam = guest_name
         resp.set_cookie(key='account_type', value='Guest')
         resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'sessionID' : str(_rnd.randint(10000000000000, 1000000000000000000000000))}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))
-    
+
     else:
+        guest_nam = None 
         acc_type = "Admin"
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
 
     return resp

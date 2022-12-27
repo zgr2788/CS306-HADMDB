@@ -33,52 +33,133 @@
     color: #03e9f4;
     font-size: 12px;
   }
+
+  .mybutton2 {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 12px;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  
+  .mybutton2:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 1px #03e9f4,
+                0 0 5px #03e9f4,
+                0 0 25px #03e9f4;
+  }
+  
+  .mybutton2 input:focus ~ button,
+  .mybutton2 input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
+
+  .delete {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 12px;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  
+  .delete:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 1px #03e9f4,
+                0 0 5px #03e9f4,
+                0 0 25px #03e9f4;
+  }
+  
+  .delete input:focus ~ button,
+  .delete input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
   
   </style>
   
   <body>
   
     <div class="login-box"; style="text-align:center;">
-      {% if acc_type == 'Guest' -%}
-        <h2>Message Board - Guest</h2>
-      {% if guest_nam is not none -%}
+      {% if account_type == 'Guest' -%}
+      <h2>Message Board - Guest</h2>
+      
+      {% if guest_name -%}
+      <h3>Guest Name: {{ guest_nam }}</h3>
+      
+      {% else -%}
       <form method = "post">
         <div class="user-box">
           <input type="text" name="name" required="">
           <label>Write Name Here</label>
         </div>
-        <a href="#"><button type="submit">
+        <a href="#"><button class="delete">
           Set Name
         </button></a>
       </form>
+
       {% endif %}
 
             
-      <form action="/message/post">
+      <form action="/messageboard/post">
         <a href="#"><button class="mybutton">
           Post New Message
         </button></a>
       </form>
 
-      <form action="/message/check">
+      <form action="/messageboard/check/guest">
         <a href="#"><button class="mybutton">
           Check Messages with Admin
         </button></a>
       </form>
-
-      <form action="/admission/home">
-        <a href="#"><button class="mybutton">
-          Admit Patients To Rooms
+      <br>
+      <br>
+      <br>
+      <h2>Admin Authentication</h2>
+      <form method = "post" action = "/message/auth">
+        <div class="user-box">
+          <input type="text" name="name" required="">
+          <label>Enter Admin Password</label>
+        </div>
+        <a href="#"><button class="delete">
+          Authenticate
         </button></a>
       </form>
-
-      <form action="/admission/discharge">
+      
+      {% else -%} 
+      <h2>Message Board - Admin</h2>
+      <form action="/messageboard/check/admin">
         <a href="#"><button class="mybutton">
-          Discharge Patients
+          Check & Respond To Messages
         </button></a>
       </form>
+      {% endif %} 
 
       
+      <br>
+      <br>
+      <br>
+      <form action="/">
+        <a href="#"><button class="mybutton">
+          Back To Home
+        </button></a>
+      </form>
     </div>
   
   </body>

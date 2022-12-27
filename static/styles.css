@@ -12,7 +12,7 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 1000px;
+  width: 1500px;
   padding: 40px;
   transform: translate(-50%, -50%);
   background: rgba(0,0,0,.5);
@@ -141,7 +141,7 @@ table{
   border: 1px solid white;
   border-collapse: collapse;
   table-layout: fixed;
-  width: 915px;
+  width: 1415px;
 }
 
 input[type="search"]::placeholder {

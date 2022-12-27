@@ -622,8 +622,7 @@ async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.S
 # Get main page
 @app.get("/messageboard")
 async def messageboard(request: _fastapi.Request, account_type: Union[str, None] = _fastapi.Cookie(default=None), guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
-
-    print(guest_name)
+    global message_id
 
     if not account_type == "Admin" and not guest_name:
         acc_type = "Guest"
@@ -635,12 +634,19 @@ async def messageboard(request: _fastapi.Request, account_type: Union[str, None]
     elif guest_name:
         acc_type = "Guest"
         guest_nam = guest_name
-        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+        
+        
+        mess_list = [message_db[i] for i in range(1,message_id) if  message_db[i]['sender'] == guest_name or message_db[i]['receiver'] == guest_name]
+
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam, 'mess' : mess_list})
 
     else:
         guest_nam = None 
         acc_type = "Admin"
-        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+
+        mess_list = [message_db[i] for i in range(1,message_id) if message_db[i]['receiver'] == "Admin"]
+
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam, 'mess' : mess_list})
 
     return resp
 
@@ -684,7 +690,9 @@ async def messageboard_admin(request: _fastapi.Request, password : str = _fastap
     
     else:
         acc_type = "Admin"
-        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+        mess_list = [message_db[i] for i in range(1,message_id) if message_db[i]['receiver'] == "Admin"]
+
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam, 'mess' : mess_list})
         resp.set_cookie(key='account_type', value='Admin')
         resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'name' : 'admin', 'password' : 'admin123'}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))    
         
@@ -693,8 +701,10 @@ async def messageboard_admin(request: _fastapi.Request, password : str = _fastap
 # Send message - Guest
 @app.get("/messageboard/post")
 async def messageboard_post_guest(request: _fastapi.Request, subject : str = "", messagecontent : str = "", guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
-    
+    global message_id
+
     message = {
+        'id' : message_id, 
         'sender' : guest_name,
         'receiver' : "Admin",        
         'content' :  messagecontent,
@@ -702,7 +712,7 @@ async def messageboard_post_guest(request: _fastapi.Request, subject : str = "",
         'date' : _dt.datetime.utcnow().replace(tzinfo=from_zone).astimezone(to_zone)
     }
     
-    global message_id
+    
 
     message_db[message_id] = message
 

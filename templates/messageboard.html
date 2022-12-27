@@ -116,7 +116,7 @@
       <br><br><br>
       <br><br><br>
 
-      <h2>My Messages - Outgoing & Incoming</h2>
+      <h2>My Messages - Sent & Received</h2>
         
       
       {% if mess -%}
@@ -204,25 +204,37 @@
       {% endif %}
       
       {% else -%}
-        <h2>All Messages</h2>
+        <h2>Admin Inbox</h2>
         
       
         {% if mess -%}
         <table width="300 px">
           <tr>
               <th width="100px">From</th>
-              <th width="100px">To</th>
               <th width="100px">Subject</th>
               <th width="100px">Date</th>
               <th width="100px">Message</th>
+              <th width="100px">Action</th>
           </tr>
           {% for mes in mess %}
           <tr style="line-height: 24px">
               <td>{{ mes.sender }}</td>
-              <td>{{ mes.receiver }}</td>
               <td>{{ mes.subject }}</td>
               <td>{{ mes.date }}</td>
               <td>{{ mes.content }}</td>
+              <td>
+                <form action="/messageboard/admin/{{ mes.id }}" method="post">
+                    <div class="user-box">
+                        <input type="text" name="replyadmin" required="">
+                        <label>Message...</label>
+                      </div>
+                    <a href="#">
+                        <button class = "mybutton2" >
+                            Respond
+                        </button>
+                    </a>
+                </form>
+              </td>
           </tr>
           {% endfor %}
         </table>

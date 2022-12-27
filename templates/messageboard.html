@@ -98,27 +98,79 @@
   
     <div class="login-box"; style="text-align:center;">
       {% if account_type == 'Guest' -%}
+      {% if not guest_name -%}
       <h2>Message Board - Guest</h2>
+      {% endif %}
       
+        
       {% if guest_name -%}
       <h4>Guest Name: {{ guest_name }}</h4>
-      <form action = "messageboard" method="post">
+      <!-- Unname function, not required but good for future dev
+              <form action = "messageboard" method="post">
         <a href="#"><button class="delete" >
           Unname Yourself
         </button></a>
       </form>
+    -->
 
-      <form action="/messageboard/post">
+      <br><br><br>
+      <br><br><br>
+
+      <h2>My Messages - Outgoing & Incoming</h2>
+        
+      
+      {% if mess -%}
+      <table width="300 px">
+        <tr>
+            <th width="100px">From</th>
+            <th width="100px">To</th>
+            <th width="100px">Subject</th>
+            <th width="100px">Date</th>
+            <th width="100px">Message</th>
+        </tr>
+        {% for mes in mess %}
+        <tr style="line-height: 24px">
+            <td>{{ mes.sender }}</td>
+            <td>{{ mes.receiver }}</td>
+            <td>{{ mes.subject }}</td>
+            <td>{{ mes.date }}</td>
+            <td>{{ mes.content }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+     
+    
+      {% else -%}
+      <div class="container">
+        <p> No new messages! </p>
+      </div>
+    
+      {% endif %} 
+
+      <br><br><br>
+      <br><br><br>
+
+      <h2>Send A New Message</h2>
+      <form action="/messageboard/post" method="get">
+        <h4>Select Issue</h4>
+        <div class="user-box">
+            <select name="subject" id="subject" required>
+                <option value="Wrong Bill Amount">Wrong Bill Amount</option>
+                <option value="Service Complaint">Service Complaint</option>
+                <option value="Doctor Complaint">Doctor Complaint</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="user-box">
+            <input type="text" name="messagecontent" required>
+            <label>Write Message...</label>
+        </div>
         <a href="#"><button class="mybutton">
           Post New Message
         </button></a>
       </form>
 
-      <form action="/messageboard/check/guest">
-        <a href="#"><button class="mybutton">
-          Check Messages with Admin
-        </button></a>
-      </form>
+
       
       {% else -%}
       <form method = "post">
@@ -158,15 +210,19 @@
         {% if mess -%}
         <table width="300 px">
           <tr>
-              <th width="100px">Name</th>
-              <th width="100px">Specialization</th>
-              <th width="100px">Id</th>
+              <th width="100px">From</th>
+              <th width="100px">To</th>
+              <th width="100px">Subject</th>
+              <th width="100px">Date</th>
+              <th width="100px">Message</th>
           </tr>
           {% for mes in mess %}
           <tr style="line-height: 24px">
-              <td>{{ mes.name }}</td>
-              <td>{{ mes.spec }}</td>
-              <td>{{ mes.id }}</td>
+              <td>{{ mes.sender }}</td>
+              <td>{{ mes.receiver }}</td>
+              <td>{{ mes.subject }}</td>
+              <td>{{ mes.date }}</td>
+              <td>{{ mes.content }}</td>
           </tr>
           {% endfor %}
         </table>

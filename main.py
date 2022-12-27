@@ -14,11 +14,19 @@ import jwt as _jwt
 import json as _json
 import random as _rnd
 from typing import List
+import datetime as _dt
+from dateutil import tz as _tz
 
+from_zone = _tz.gettz('UTC')
+to_zone = _tz.gettz('Turkey')
 
 app = _fastapi.FastAPI()
 
 _services.create_database()
+
+# NoSQL Database initialized here
+message_id = 1
+message_db = {}
 
 app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static")
 
@@ -615,15 +623,20 @@ async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.S
 @app.get("/messageboard")
 async def messageboard(request: _fastapi.Request, account_type: Union[str, None] = _fastapi.Cookie(default=None), guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
 
-    if not account_type == "Admin":
+    print(guest_name)
+
+    if not account_type == "Admin" and not guest_name:
         acc_type = "Guest"
         guest_nam = None
         resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
-        if guest_name:
-            guest_nam = guest_name
         resp.set_cookie(key='account_type', value='Guest')
         resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'sessionID' : str(_rnd.randint(10000000000000, 1000000000000000000000000))}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))    
-        
+    
+    elif guest_name:
+        acc_type = "Guest"
+        guest_nam = guest_name
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+
     else:
         guest_nam = None 
         acc_type = "Admin"
@@ -649,6 +662,7 @@ async def messageboard(request: _fastapi.Request, name : str = _fastapi.Form("")
         resp.delete_cookie(key='guest_name')
         return resp
 
+# On exit
 @app.get("/exitmessages")
 async def on_exit(request: _fastapi.Request):
     resp = templates.TemplateResponse('homepage.html', context = {'request' : request})
@@ -657,6 +671,7 @@ async def on_exit(request: _fastapi.Request):
     resp.delete_cookie(key='token')
     return resp
 
+# Admin auth
 @app.post("/messageboard/admin")
 async def messageboard_admin(request: _fastapi.Request, password : str = _fastapi.Form()):
     acc_type = "Guest"
@@ -674,5 +689,28 @@ async def messageboard_admin(request: _fastapi.Request, password : str = _fastap
         resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'name' : 'admin', 'password' : 'admin123'}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))    
         
         return resp
+
+# Send message - Guest
+@app.get("/messageboard/post")
+async def messageboard_post_guest(request: _fastapi.Request, subject : str = "", messagecontent : str = "", guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
+    
+    message = {
+        'sender' : guest_name,
+        'receiver' : "Admin",        
+        'content' :  messagecontent,
+        'subject' : subject,
+        'date' : _dt.datetime.utcnow().replace(tzinfo=from_zone).astimezone(to_zone)
+    }
+    
+    global message_id
+
+    message_db[message_id] = message
+
+    message_id += 1
+
+    print(message_db)
+
+    return _fastapi.responses.RedirectResponse("/messageboard")
+
 
 

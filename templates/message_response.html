@@ -1,0 +1,113 @@
+<head>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+  </head>
+  
+  <style>
+  .mybutton {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 16px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    letter-spacing: 4px;
+    cursor: pointer;
+  }
+  
+  .mybutton:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 5px #03e9f4,
+                0 0 25px #03e9f4,
+                0 0 50px #03e9f4,
+                0 0 100px #03e9f4;
+  }
+  
+  .mybutton input:focus ~ button,
+  .mybutton input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
+
+  .mybutton2 {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 12px;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  
+  .mybutton2:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 1px #03e9f4,
+                0 0 5px #03e9f4,
+                0 0 25px #03e9f4;
+  }
+  
+  .mybutton2 input:focus ~ button,
+  .mybutton2 input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
+
+  .delete {
+    position: relative;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #03e9f4;
+    font-size: 12px;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  
+  .delete:hover {
+    background: transparent;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 1px #03e9f4,
+                0 0 5px #03e9f4,
+                0 0 25px #03e9f4;
+  }
+  
+  .delete input:focus ~ button,
+  .delete input:valid ~ button {
+    top: -10px;
+    left: 0;
+    color: #03e9f4;
+    font-size: 12px;
+  }
+  
+  </style>
+
+
+<body>
+
+    
+  
+    <div class="login-box"; style="text-align:center;">
+    <h2>Responding to Message with ID: {{ mes_id }} from {{ guest_name }}</h2>
+    <h4>Subject: {{ subject }}</h4>
+        <form method="post">
+            <div class="user-box">
+                <input type="text" name="messagecontent" required>
+                <label>Write Message...</label>
+            </div>
+        </form>
+    </div>
+
+</body>

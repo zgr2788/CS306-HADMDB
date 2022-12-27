@@ -223,11 +223,7 @@
               <td>{{ mes.date }}</td>
               <td>{{ mes.content }}</td>
               <td>
-                <form action="/messageboard/admin/{{ mes.id }}" method="post">
-                    <div class="user-box">
-                        <input type="text" name="replyadmin" required="">
-                        <label>Message...</label>
-                      </div>
+                <form action="/messageboard/admin/post/{{ mes.id }}/{{ mes.sender }}/{{ mes.subject }}" method="get">
                     <a href="#">
                         <button class = "mybutton2" >
                             Respond

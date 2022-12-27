@@ -679,7 +679,7 @@ async def on_exit(request: _fastapi.Request):
 
 # Admin auth
 @app.post("/messageboard/admin")
-async def messageboard_admin(request: _fastapi.Request, password : str = _fastapi.Form()):
+async def messageboard_admin(request: _fastapi.Request, password : str = _fastapi.Form("admin123")):
     acc_type = "Guest"
     guest_nam = None
 
@@ -718,9 +718,29 @@ async def messageboard_post_guest(request: _fastapi.Request, subject : str = "",
 
     message_id += 1
 
-    print(message_db)
-
     return _fastapi.responses.RedirectResponse("/messageboard")
 
 
+# Send message - Admin
+@app.get("/messageboard/admin/post/{mes_id}/{guest_name}/{subject}")
+async def messageboard_post_admin(request: _fastapi.Request, mes_id : int, guest_name : str, subject : str):
+    return templates.TemplateResponse("message_response.html", context={'request' : request, 'mes_id' : mes_id, 'guest_name' : guest_name, 'subject' : subject})
 
+@app.post("/messageboard/admin/post/{mes_id}/{guest_name}/{subject}")
+async def messageboard_post_admin(request: _fastapi.Request, mes_id : int, guest_name : str, subject : str, messagecontent : str = _fastapi.Form()):
+    global message_id
+
+    message = {
+        'id' : message_id, 
+        'sender' : "Admin",
+        'receiver' : guest_name,        
+        'content' :  messagecontent,
+        'subject' : "Reply to " + subject,
+        'date' : _dt.datetime.utcnow().replace(tzinfo=from_zone).astimezone(to_zone)
+    }
+
+    message_db[message_id] = message
+
+    message_id += 1
+
+    return _fastapi.responses.RedirectResponse("/messageboard/admin")

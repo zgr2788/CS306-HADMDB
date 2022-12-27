@@ -101,22 +101,13 @@
       <h2>Message Board - Guest</h2>
       
       {% if guest_name -%}
-      <h3>Guest Name: {{ guest_nam }}</h3>
-      
-      {% else -%}
-      <form method = "post">
-        <div class="user-box">
-          <input type="text" name="name" required="">
-          <label>Write Name Here</label>
-        </div>
-        <a href="#"><button class="delete">
-          Set Name
+      <h4>Guest Name: {{ guest_name }}</h4>
+      <form action = "messageboard" method="post">
+        <a href="#"><button class="delete" >
+          Unname Yourself
         </button></a>
       </form>
 
-      {% endif %}
-
-            
       <form action="/messageboard/post">
         <a href="#"><button class="mybutton">
           Post New Message
@@ -128,36 +119,75 @@
           Check Messages with Admin
         </button></a>
       </form>
+      
+      {% else -%}
+      <form method = "post">
+        <div class="user-box">
+          <input type="text" name="name" required>
+          <label>Write Name Here</label>
+        </div>
+        <a href="#"><button class="delete">
+          Set Name
+        </button></a>
+      </form>
+
+      
       <br>
       <br>
       <br>
       <h2>Admin Authentication</h2>
-      <form method = "post" action = "/message/auth">
+      <form method = "post" action = "/messageboard/admin">
         <div class="user-box">
-          <input type="text" name="name" required="">
+          <input type="text" name="password" required="">
           <label>Enter Admin Password</label>
         </div>
+        {% if errorMessage -%}
+        <p>{{ errorMessage }}</p>
+        {% endif %}
         <a href="#"><button class="delete">
           Authenticate
         </button></a>
       </form>
+
+      {% endif %}
       
-      {% else -%} 
-      <h2>Message Board - Admin</h2>
-      <form action="/messageboard/check/admin">
-        <a href="#"><button class="mybutton">
-          Check & Respond To Messages
-        </button></a>
-      </form>
+      {% else -%}
+        <h2>All Messages</h2>
+        
+      
+        {% if mess -%}
+        <table width="300 px">
+          <tr>
+              <th width="100px">Name</th>
+              <th width="100px">Specialization</th>
+              <th width="100px">Id</th>
+          </tr>
+          {% for mes in mess %}
+          <tr style="line-height: 24px">
+              <td>{{ mes.name }}</td>
+              <td>{{ mes.spec }}</td>
+              <td>{{ mes.id }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+       
+      
+        {% else -%}
+        <div class="container">
+          <p> No new messages! </p>
+        </div>
+      
+        {% endif %} 
+
       {% endif %} 
 
       
       <br>
       <br>
       <br>
-      <form action="/">
+      <form action="/exitmessages">
         <a href="#"><button class="mybutton">
-          Back To Home
+          Back To Home - Ends Current Session
         </button></a>
       </form>
     </div>

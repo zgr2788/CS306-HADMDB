@@ -36,13 +36,12 @@ def get_db():
 
 # Auth for admin
 async def auth_admin(password : str):
-    if password==adminJWT('password'):
+    token = None
+    if password==adminJWT['password']:
         token = _jwt.encode(_json.loads(_json.dumps(adminJWT, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)
         return token, True
-    
-    else:
-        token = 'Wrong password!'
-        return token, False 
+
+    return token, False 
 
 # Insert some doctors, nurses, rooms, personnel and patients
 async def insert_dummy_data(db : _orm.Session):

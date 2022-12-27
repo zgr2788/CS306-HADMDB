@@ -24,6 +24,7 @@ app.mount("/static", _StaticFiles.StaticFiles(directory="static"), name="static"
 
 templates = _templates.Jinja2Templates(directory = "templates")
 JWT_SECRET_ADMIN = 'ADMINSECRETHADMDB'
+adminJWT = {'name' : 'admin', 'password' : 'admin123'} # standard admin password
 
 # On startup, add random data for the database
 @app.on_event("startup")
@@ -609,6 +610,8 @@ async def discharged_patient(request: _fastapi.Request, pat_id : int, db: _orm.S
 # MESSAGE BOARD
 
 #*********************************************************
+
+# Get main page
 @app.get("/messageboard")
 async def messageboard(request: _fastapi.Request, account_type: Union[str, None] = _fastapi.Cookie(default=None), guest_name: Union[str, None] = _fastapi.Cookie(default=None)):
 
@@ -619,11 +622,57 @@ async def messageboard(request: _fastapi.Request, account_type: Union[str, None]
         if guest_name:
             guest_nam = guest_name
         resp.set_cookie(key='account_type', value='Guest')
-        resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'sessionID' : str(_rnd.randint(10000000000000, 1000000000000000000000000))}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))
-
+        resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'sessionID' : str(_rnd.randint(10000000000000, 1000000000000000000000000))}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))    
+        
     else:
         guest_nam = None 
         acc_type = "Admin"
         resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
 
     return resp
+
+
+# Guest set name 
+@app.post("/messageboard")
+async def messageboard(request: _fastapi.Request, name : str = _fastapi.Form("")):
+    if name != "":
+        acc_type = "Guest"
+        guest_nam = name
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+        resp.set_cookie(key='guest_name', value=name)
+        return resp
+    
+    else:
+        acc_type = "Guest"
+        guest_nam = None
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+        resp.delete_cookie(key='guest_name')
+        return resp
+
+@app.get("/exitmessages")
+async def on_exit(request: _fastapi.Request):
+    resp = templates.TemplateResponse('homepage.html', context = {'request' : request})
+    resp.delete_cookie(key='guest_name')
+    resp.delete_cookie(key='account_type')
+    resp.delete_cookie(key='token')
+    return resp
+
+@app.post("/messageboard/admin")
+async def messageboard_admin(request: _fastapi.Request, password : str = _fastapi.Form()):
+    acc_type = "Guest"
+    guest_nam = None
+
+    token, check = await _services.auth_admin(password)
+    
+    if not check:
+        return _fastapi.responses.RedirectResponse(url='/messageboard')
+    
+    else:
+        acc_type = "Admin"
+        resp = templates.TemplateResponse('messageboard.html', context = {'request' : request, 'account_type' : acc_type, 'guest_name' : guest_nam})
+        resp.set_cookie(key='account_type', value='Admin')
+        resp.set_cookie(key='token', value=str(_jwt.encode(_json.loads(_json.dumps({'name' : 'admin', 'password' : 'admin123'}, indent = 4, sort_keys=True, default=str)), JWT_SECRET_ADMIN)))    
+        
+        return resp
+
+
